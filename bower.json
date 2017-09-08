@@ -1,5 +1,5 @@
 {
-  "name": "Graduation_project_selection_site",
+  "name": "graduation-project-selection_site",
   "authors": [
     "JasonQSY <syqian@sjtu.edu.cn>"
   ],
@@ -17,6 +17,8 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "font-awesome": "^4.7.0",
-    "Bootstrap Markdown Editor": "bootstrap-markdown-editor#^2.0.1"
+    "bootstrap-markdown-editor": "bootstrap-markdown-editor#^2.0.1",
+    "blueimp-file-upload": "^9.19.1",
+    "wangEditor": "^3.0.8"
   }
 }

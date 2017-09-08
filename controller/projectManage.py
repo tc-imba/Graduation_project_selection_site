@@ -5,12 +5,17 @@ from controller.account import *
 import time
 import os
 import re
+import urllib.parse
+import hashlib
+import json
 from util.env import *
+from PIL import Image
 
 env = get_env()
 base_url = env['domain'] and env['domain'] or 'http://localhost'
 if env['port']:
     base_url += ':' + str(env['port'])
+
 
 class createProjectHandler(BaseHandler):
     @tornado.web.authenticated
@@ -32,7 +37,8 @@ class createProjectHandler(BaseHandler):
         if role == 'stu':
             self.render('403.html', u_name=u_name, role=role)
         else:
-            self.render('create_project.html', u_name=u_name, proj=project, role=role, title=title, detail=detail, isedit=isedit, pid=pid, baseurl=base_url)
+            self.render('create_project.html', u_name=u_name, proj=project, role=role, title=title, detail=detail,
+                        isedit=isedit, pid=pid, baseurl=base_url)
 
     @tornado.web.authenticated
     def post(self):
@@ -68,6 +74,7 @@ class createProjectHandler(BaseHandler):
             self.clear_cookie("pic_name")
             self.write("success")
 
+
 class quitProj(BaseHandler):
     @tornado.web.authenticated
     def post(self):
@@ -75,7 +82,7 @@ class quitProj(BaseHandler):
         id = int(self.get_argument("id"))
         user = userDB(uid)
         res = user.query()
-        if res['grouped']=='y':
+        if res['grouped'] == 'y':
             self.write('You need to ask team leader to quit the project')
         else:
             registed = res['registed'].split(',')
@@ -85,6 +92,7 @@ class quitProj(BaseHandler):
                 self.write("success")
             else:
                 self.write("You havn't registered the project")
+
 
 class registerHandler(BaseHandler):
     @tornado.web.authenticated
@@ -111,12 +119,12 @@ class registerHandler(BaseHandler):
             user.register(data)
             self.write('success')
 
+
 class detailHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, id):
         proj = projectDB(id)
         if not self.is_viewed(id):
-
             proj.view()
         proj = proj.query()
         for i in range(3):
@@ -132,7 +140,91 @@ class detailHandler(BaseHandler):
         res = userDB(uid).query()
         isIn = id in res['registed']
         role = res['role']
-        self.render("detail.html", i=id, proj=proj, u_name=self.get_secure_cookie('u_name'), isIn=isIn, role=role, baseurl=base_url)
+        self.render("detail.html", i=id, proj=proj, u_name=self.get_secure_cookie('u_name'), isIn=isIn, role=role,
+                    baseurl=base_url)
+
+
+MIN_FILE_SIZE = 1  # 1B
+MAX_FILE_SIZE = 10485760  # 10MB
+IMAGE_TYPES = re.compile('image/(gif|p?jpeg|(x-)?png)')
+# ACCEPT_FILE_TYPES = IMAGE_TYPES
+THUMB_MAX_WIDTH = 80
+THUMB_MAX_HEIGHT = 80
+THUMB_SUFFIX = '.' + str(THUMB_MAX_WIDTH) + 'x' + str(THUMB_MAX_HEIGHT) + '.png'
+EXPIRATION_TIME = 300  # seconds
+
+
+class uploadFileHandler(BaseHandler):
+    @tornado.web.authenticated
+    def validate(self, file):
+        if file['size'] < MIN_FILE_SIZE:
+            file['error'] = 'File is too small'
+        elif file['size'] > MAX_FILE_SIZE:
+            file['error'] = 'File is too big'
+        else:
+            return True
+        return False
+
+    def write_blob(self, data, info):
+        filename_temp = hashlib.sha1(data).hexdigest() + '.' + info['name']
+        file_path = 'temp/' + filename_temp
+        key = 'uploadfile?key=' + filename_temp
+        thumbnail_key = None
+        file = open(file_path, 'wb')
+        file.write(data)
+        file.close()
+        if IMAGE_TYPES.match(info['type']):
+            im = Image.open(file_path)
+            im.thumbnail((THUMB_MAX_WIDTH, THUMB_MAX_HEIGHT))
+            im.save('temp/thumb.' + filename_temp)
+            thumbnail_key = 'temp/thumb.' + filename_temp
+        return key, thumbnail_key
+
+    def handle_upload(self):
+        results = []
+        for name in self.request.files:
+            file = self.request.files[name][0]
+            result = {
+                'name': file.filename,
+                'type': file.content_type,
+                'size': len(file.body)
+            }
+            if self.validate(result):
+                key, thumbnail_key = self.write_blob(file.body, result)
+                if key is not None:
+                    result['url'] = base_url + '/' + key
+                    result['deleteUrl'] = result['url']
+                    result['deleteType'] = 'DELETE'
+                    if thumbnail_key is not None:
+                        result['thumbnailUrl'] = base_url + '/' + thumbnail_key
+                else:
+                    result['error'] = 'Failed to store uploaded file.'
+            results.append(result)
+        return results
+
+    def head(self):
+        pass
+
+    def get(self):
+        self.redirect(base_url)
+
+    def delete(self):
+        key = self.get_argument('key')
+        try:
+            os.remove('temp/' + key)
+            os.remove('temp/thumb.' + key)
+        except FileNotFoundError:
+            pass
+        result = {'key': key}
+        s = json.dumps(result)
+        self.set_header('Content-Type', 'application/json')
+        self.write(s)
+
+    def post(self):
+        result = {'files': self.handle_upload()}
+        s = json.dumps(result)
+        self.set_header('Content-Type', 'application/json')
+        self.write(s)
 
 
 class uploadPicHandler(BaseHandler):
@@ -158,6 +250,7 @@ class uploadPicHandler(BaseHandler):
             self.set_secure_cookie("pic_name", fileName)
             self.finish(fileName)
 
+
 class deleteProjHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self):
@@ -171,6 +264,7 @@ class deleteProjHandler(BaseHandler):
             proj = projectDB(pid)
             proj.deleteProject()
             self.write('success')
+
 
 class assignProjHandler(BaseHandler):
     @tornado.web.authenticated
@@ -234,7 +328,7 @@ class assignProjHandler(BaseHandler):
                 if udata['grouped'] == 'y':
                     continue
                 else:
-                    quit_res = udata['registed'].replace(str(pid),'n')
+                    quit_res = udata['registed'].replace(str(pid), 'n')
                     udb.register(quit_res)
         filter = re.compile(r'.+-(\d+)')
         for usr in res.split(','):
