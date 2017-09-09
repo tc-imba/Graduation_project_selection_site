@@ -14,82 +14,94 @@
     <script src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
     <script src="//cdn.bootcss.com/jquery.form/4.2.1/jquery.form.js"></script>
     <script>
-        $(document).ready(function(){
-            $("#create").click(function(){
+        $(document).ready(function () {
+            $("#create").click(function () {
                 $.post("/createproject",
                     {
-                {% if pid != '' %}
+                        {% if pid != '' %}
                         pid: {{ pid }},
-                {% end %}isedit: "{{ isedit }}",
+                        {% end %}isedit: "{{ isedit }}",
                         sponsor: $("#sponsor").val(),
                         instructor: $("#instructor").val(),
                         title: $("#title").val(),
                         detail: $("#myEditor").val(),
                         major: $("#major").val()
                     },
-                    function(data,status){
-                    alert(data);
-                });
-                window.location="{{ baseurl }}";
+                    function (data, status) {
+                        alert(data);
+                    });
+                window.location = "{{ baseurl }}";
             });
             $("#title").val("{{ title }}");
             $("#instructor").val("{{ proj['instructor'] }}");
             $("#sponsor").val("{{ proj['sponsor'] }}");
-            $("#major").val("{{ proj['major'] }}")
+            $("#major").val("{{ proj['major'] }}");
+
+            $('#myEditor').markdownEditor();
+
+            $('#fileupload').fileupload({
+                url: 'uploadfile'
+            });
+
+            var files = JSON.parse("{{ proj['files'] }}");
+            for (var i = 0; i < files.length; i++) {
+                
+            }
+
         });
-{#        $('#fileupload-form').on('submit',(function(e) {#}
-{#   	e.preventDefault();#}
-{#   	//序列化表单#}
-{#      var serializeData = $(this).serialize();#}
-{##}
-{#      // var formData = new FormData(this);#}
-{#      $(this).ajaxSubmit({#}
-{#           type:'POST',#}
-{#           url: "/uploadPic",#}
-{#           dataType: 'json',#}
-{#           data: serializeData,#}
-{#           // data: formData,#}
-{##}
-{#           //attention!!!#}
-{#           contentType: false,#}
-{#           cache: false,#}
-{#           processData:false,#}
-{##}
-{#           beforeSubmit: function() {#}
-{#           		//上传图片之前的处理#}
-{#           },#}
-{#           uploadProgress: function (event, position, total, percentComplete){#}
-{#               //在这里控制进度条#}
-{#           },#}
-{#           success:function(){#}
-{#               alert('succ');#}
-{##}
-{#           },#}
-{#           error:function(data){#}
-{#               alert('上传图片出错');#}
-{#           }#}
-{#       });#}
-{#   }));#}
-{##}
-{#//绑定文件选择事件，一选择了图片，就让`form`提交。#}
-{##}
-{#   $("#fileupload").on("change", function() {#}
-{#       alert('asdfasdf');#}
-{#       $(this).parent().submit();#}
-{# });#}
-{#        $(document).ready(function(){#}
-{#            $("#create").click(function(){#}
-{#                $.post("/createproject",#}
-{#                    {#}
-{#                        title: $("#title").val(),#}
-{#                        detail: $("#myEditor").val()#}
-{#                    },#}
-{#                    function(data,status){#}
-{#                    alert(data);#}
-{#                    window.location="http://{{ baseurl }}";#}
-{#                });#}
-{#            });#}
-{#        });#}
+        {#        $('#fileupload-form').on('submit',(function(e) {#}
+        {#   	e.preventDefault();#}
+        {#   	//序列化表单#}
+        {#      var serializeData = $(this).serialize();#}
+        {##}
+        {#      // var formData = new FormData(this);#}
+        {#      $(this).ajaxSubmit({#}
+        {#           type:'POST',#}
+        {#           url: "/uploadPic",#}
+        {#           dataType: 'json',#}
+        {#           data: serializeData,#}
+        {#           // data: formData,#}
+        {##}
+        {#           //attention!!!#}
+        {#           contentType: false,#}
+        {#           cache: false,#}
+        {#           processData:false,#}
+        {##}
+        {#           beforeSubmit: function() {#}
+        {#           		//上传图片之前的处理#}
+        {#           },#}
+        {#           uploadProgress: function (event, position, total, percentComplete){#}
+        {#               //在这里控制进度条#}
+        {#           },#}
+        {#           success:function(){#}
+        {#               alert('succ');#}
+        {##}
+        {#           },#}
+        {#           error:function(data){#}
+        {#               alert('上传图片出错');#}
+        {#           }#}
+        {#       });#}
+        {#   }));#}
+        {##}
+        {#//绑定文件选择事件，一选择了图片，就让`form`提交。#}
+        {##}
+        {#   $("#fileupload").on("change", function() {#}
+        {#       alert('asdfasdf');#}
+        {#       $(this).parent().submit();#}
+        {# });#}
+        {#        $(document).ready(function(){#}
+        {#            $("#create").click(function(){#}
+        {#                $.post("/createproject",#}
+        {#                    {#}
+        {#                        title: $("#title").val(),#}
+        {#                        detail: $("#myEditor").val()#}
+        {#                    },#}
+        {#                    function(data,status){#}
+        {#                    alert(data);#}
+        {#                    window.location="http://{{ baseurl }}";#}
+        {#                });#}
+        {#            });#}
+        {#        });#}
     </script>
 </head>
 <body>
@@ -122,7 +134,7 @@
                             class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         <li><a href="/option">My Profile</a></li>
-                        <li><a href="/export">Export data</a> </li>
+                        <li><a href="/export">Export data</a></li>
                         <li><a href="/logout">Log out</a></li>
                         <li class="divider"></li>
                         <li><a href="#">Create a Group</a></li>
@@ -132,10 +144,10 @@
         </div>
     </div>
 </nav>
-<div class="contents create-project" style ="width: 65%;">
-        {% if title != '' %}
-        leave the picture submit form if you don't need to change the picture</br>
-        {% end %}
+<div class="contents create-project" style="width: 65%;">
+    {% if title != '' %}
+    leave the picture submit form if you don't need to change the picture</br>
+    {% end %}
     <div class="upload-title-pic">
         <span style="margin-right:5px">Project Avatar: </span>
         <!--<form id="fileupload-form">
@@ -204,15 +216,19 @@
             </div>
         </div>
         <!-- The table listing the files available for upload/download -->
-        <table role="presentation" class="table table-striped"><tbody class="files"></tbody></table>
+        <table role="presentation" class="table table-striped">
+            <tbody class="files"></tbody>
+        </table>
     </form>
 
 
-    <div class="btn-here" style="text-align:center; margin-left:auto; margin-right:auto;"><button type="button" class="btn btn-primary btn-create" id="create">Create</button></div>
+    <div class="btn-here" style="text-align:center; margin-left:auto; margin-right:auto;">
+        <button type="button" class="btn btn-primary btn-create" id="create">Create</button>
+    </div>
 
     <div class="form-group" style="display: none">
-                        <input name="picready" class="form-control" value="">
-                    </div>
+        <input name="picready" class="form-control" value="">
+    </div>
 </div>
 <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -221,13 +237,13 @@
 
 <!-- The template to display files available for upload -->
 <script id="template-upload" type="text/x-tmpl">
-{%! for (var i=0, file; file=o.files[i]; i++) { %}
+{% ! for (var i=0, file; file=o.files[i]; i++) { %}
     <tr class="template-upload fade">
         <td>
             <span class="preview"></span>
         </td>
         <td>
-            <p class="name">{%!=file.name%}</p>
+            <p class="name">{% !=file.name %}</p>
             <strong class="error text-danger"></strong>
         </td>
         <td>
@@ -235,64 +251,68 @@
             <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
         </td>
         <td>
-            {%! if (!i && !o.options.autoUpload) { %}
+            {% ! if (!i && !o.options.autoUpload) { %}
                 <button class="btn btn-primary start" disabled>
                     <i class="glyphicon glyphicon-upload"></i>
                     <span>Start</span>
                 </button>
-            {%! } %}
-            {%! if (!i) { %}
+            {% ! } %}
+            {% ! if (!i) { %}
                 <button class="btn btn-warning cancel">
                     <i class="glyphicon glyphicon-ban-circle"></i>
                     <span>Cancel</span>
                 </button>
-            {%! } %}
+            {% ! } %}
         </td>
     </tr>
-{%! } %}
+{% ! } %}
+
+
 </script>
 <!-- The template to display files available for download -->
 <script id="template-download" type="text/x-tmpl">
-{%! for (var i=0, file; file=o.files[i]; i++) { %}
+{% ! for (var i=0, file; file=o.files[i]; i++) { %}
     <tr class="template-download fade">
         <td>
             <span class="preview">
-                {%! if (file.thumbnailUrl) { %}
-                    <a href="{%!=file.url%}" title="{%!=file.name%}" download="{%!=file.name%}" data-gallery><img src="{%!=file.thumbnailUrl%}"></a>
-                {%! } %}
+                {% ! if (file.thumbnailUrl) { %}
+                    <a href="{% !=file.url %}" title="{% !=file.name %}" download="{% !=file.name %}" data-gallery><img src="{% !=file.thumbnailUrl %}"></a>
+                {% ! } %}
             </span>
         </td>
         <td>
             <p class="name">
-                {%! if (file.url) { %}
-                    <a href="{%!=file.url%}" title="{%!=file.name%}" download="{%!=file.name%}" {%!=file.thumbnailUrl?'data-gallery':''%}>{%!=file.name%}</a>
-                {%! } else { %}
-                    <span>{%!=file.name%}</span>
-                {%! } %}
+                {% ! if (file.url) { %}
+                    <a href="{% !=file.url %}" title="{% !=file.name %}" download="{% !=file.name %}" {% !=file.thumbnailUrl?'data-gallery':'' %}>{% !=file.name %}</a>
+                {% ! } else { %}
+                    <span>{% !=file.name %}</span>
+                {% ! } %}
             </p>
-            {%! if (file.error) { %}
-                <div><span class="label label-danger">Error</span> {%!=file.error%}</div>
-            {%! } %}
+            {% ! if (file.error) { %}
+                <div><span class="label label-danger">Error</span> {% !=file.error %}</div>
+            {% ! } %}
         </td>
         <td>
-            <span class="size">{%!=o.formatFileSize(file.size)%}</span>
+            <span class="size">{% !=o.formatFileSize(file.size) %}</span>
         </td>
         <td>
-            {%! if (file.deleteUrl) { %}
-                <button class="btn btn-danger delete" data-type="{%!=file.deleteType%}" data-url="{%!=file.deleteUrl%}"{%! if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{%! } %}>
+            {% ! if (file.deleteUrl) { %}
+                <button class="btn btn-danger delete" data-type="{% !=file.deleteType %}" data-url="{% !=file.deleteUrl %}"{% ! if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% ! } %}>
                     <i class="glyphicon glyphicon-trash"></i>
                     <span>Delete</span>
                 </button>
                 <input type="checkbox" name="delete" value="1" class="toggle">
-            {%! } else { %}
+            {% ! } else { %}
                 <button class="btn btn-warning cancel">
                     <i class="glyphicon glyphicon-ban-circle"></i>
                     <span>Cancel</span>
                 </button>
-            {%! } %}
+            {% ! } %}
         </td>
     </tr>
-{%! } %}
+{% ! } %}
+
+
 </script>
 
 <script src="../bower_components/blueimp-file-upload/js/vendor/jquery.ui.widget.js"></script>

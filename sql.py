@@ -332,7 +332,7 @@ class projectDB(dbFunction):
         if userDB(int(userid)).isLeader():
             self.changeChosen(int(seq), 1)
 
-    def newProject(self, title, detail, img, sponsor='', major='', instructor=''):
+    def newProject(self, title, detail, img, sponsor='', instructor='', major='', files='[]'):
         op = (
             "INSERT INTO projects VALUES (%d, '%s', '%s', '%s', '%s', '', '', '', 0, 0, 0, 0, 0, '%s', '%s', 'n')" % (
                 self.id, title, img, sponsor, detail, major, instructor))
@@ -363,7 +363,7 @@ class projectDB(dbFunction):
         op = ("UPDATE projects SET chosen_num%d=%d WHERE id=%d" % (seq, chosen + int(change), self.id))
         self.dataUpdate(op)
 
-    def editProject(self, title, detail, img, sponsor, instructor, major):
+    def editProject(self, title, detail, img, sponsor, instructor, major, files='[]'):
         if img:
             op = ("UPDATE projects SET title='%s', detail='%s', img='%s', sponsor='%s', instructor='%s', major='%s' WHERE id=%d" % (title, detail, img, sponsor, instructor, major, self.id))
         else:

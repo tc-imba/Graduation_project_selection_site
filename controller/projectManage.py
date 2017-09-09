@@ -61,16 +61,39 @@ class createProjectHandler(BaseHandler):
             sponsor = self.get_argument("sponsor")
             instructor = self.get_argument("instructor")
             major = self.get_argument('major')
+            new_files = self.get_argument('new_files', default='[]')
+            old_files = self.get_argument('old_files', default='[]')
             detail = detail.replace("'", "''")
             sponsor = sponsor.replace("'", "''")
             instructor = instructor.replace("'", "''")
             major = major.replace("'", "''")
             img = pic_name
+
+            new_files = json.dumps(new_files)
+            old_files = json.dumps(old_files)
+            files = []
+            for i in new_files:
+                try:
+                    os.rename('temp/' + new_files[i], 'files/' + new_files[i])
+                except FileNotFoundError:
+                    continue
+                try:
+                    os.rename('temp/thumb.' + new_files[i], 'files/thumb.' + new_files[i])
+                except FileNotFoundError:
+                    pass
+                files.append(new_files[i])
+
+            for i in old_files:
+                if os.path.exists('files/' + old_files[i]):
+                    files.append(old_files[i])
+
+            files = json.dumps(files)
+
             if isedit == "false":
-                projectDB().newProject(title, detail, img, sponsor, major, instructor)
+                projectDB().newProject(title, detail, img, sponsor, instructor, major, files)
             else:
                 pid = self.get_argument("pid")
-                projectDB(pid).editProject(title, detail, img, sponsor, instructor, major)
+                projectDB(pid).editProject(title, detail, img, sponsor, instructor, major, files)
             self.clear_cookie("pic_name")
             self.write("success")
 
@@ -209,8 +232,8 @@ class uploadFileHandler(BaseHandler):
         self.redirect(base_url)
 
     def delete(self):
-        key = self.get_argument('key')
-        _type = self.get_argument('type')
+        key = self.get_argument('key', default='')
+        _type = self.get_argument('type', default='temp')
         try:
             os.remove(_type + '/' + key)
             os.remove(_type + '/thumb.' + key)
