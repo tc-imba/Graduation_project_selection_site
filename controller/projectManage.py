@@ -168,7 +168,7 @@ class uploadFileHandler(BaseHandler):
     def write_blob(self, data, info):
         filename_temp = hashlib.sha1(data).hexdigest() + '.' + info['name']
         file_path = 'temp/' + filename_temp
-        key = 'uploadfile?key=' + filename_temp
+        key = 'uploadfile?type=temp&key=' + filename_temp
         thumbnail_key = None
         file = open(file_path, 'wb')
         file.write(data)
@@ -210,9 +210,10 @@ class uploadFileHandler(BaseHandler):
 
     def delete(self):
         key = self.get_argument('key')
+        _type = self.get_argument('type')
         try:
-            os.remove('temp/' + key)
-            os.remove('temp/thumb.' + key)
+            os.remove(_type + '/' + key)
+            os.remove(_type + '/thumb.' + key)
         except FileNotFoundError:
             pass
         result = {'key': key}
