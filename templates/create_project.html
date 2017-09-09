@@ -15,6 +15,10 @@
     <script src="//cdn.bootcss.com/jquery.form/4.2.1/jquery.form.js"></script>
     <script>
         $(document).ready(function () {
+            var processFiles = function () {
+
+            };
+
             $("#create").click(function () {
                 $.post("/createproject",
                     {
@@ -43,10 +47,27 @@
                 url: 'uploadfile'
             });
 
+            var $files = $('#fileupload .files');
             var files = JSON.parse("{{ proj['files'] }}");
             for (var i = 0; i < files.length; i++) {
-                
+                console.log(files[i]);
             }
+            var data = {
+                files: files,
+                {#"files": [{
+                    "deleteUrl": "http://localhost:8080/uploadfile?type=temp&key=daf1ba24ba83dce90c24f1f6917ac59499e34a66.0.txt",
+                    "type": "temp",
+                    "size": 2164891,
+                    "deleteType": "DELETE",
+                    "url": "http://localhost:8080/uploadfile?type=temp&key=daf1ba24ba83dce90c24f1f6917ac59499e34a66.0.txt",
+                    "name": "0.txt",
+                    "tempName": "daf1ba24ba83dce90c24f1f6917ac59499e34a66.0.txt"
+                }],#}
+                formatFileSize: $.blueimp.fileupload.prototype._formatFileSize
+            };
+            var html = tmpl("template-download", data);
+            $files.append(html);
+            $files.children('.template-download').addClass('in');
 
         });
         {#        $('#fileupload-form').on('submit',(function(e) {#}
@@ -237,13 +258,13 @@
 
 <!-- The template to display files available for upload -->
 <script id="template-upload" type="text/x-tmpl">
-{% ! for (var i=0, file; file=o.files[i]; i++) { %}
+{%! for (var i=0, file; file=o.files[i]; i++) { %}
     <tr class="template-upload fade">
         <td>
             <span class="preview"></span>
         </td>
         <td>
-            <p class="name">{% !=file.name %}</p>
+            <p class="name">{%!=file.name %}</p>
             <strong class="error text-danger"></strong>
         </td>
         <td>
@@ -251,66 +272,66 @@
             <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
         </td>
         <td>
-            {% ! if (!i && !o.options.autoUpload) { %}
+            {%! if (!i && !o.options.autoUpload) { %}
                 <button class="btn btn-primary start" disabled>
                     <i class="glyphicon glyphicon-upload"></i>
                     <span>Start</span>
                 </button>
-            {% ! } %}
-            {% ! if (!i) { %}
+            {%! } %}
+            {%! if (!i) { %}
                 <button class="btn btn-warning cancel">
                     <i class="glyphicon glyphicon-ban-circle"></i>
                     <span>Cancel</span>
                 </button>
-            {% ! } %}
+            {%! } %}
         </td>
     </tr>
-{% ! } %}
+{%! } %}
 
 
 </script>
 <!-- The template to display files available for download -->
 <script id="template-download" type="text/x-tmpl">
-{% ! for (var i=0, file; file=o.files[i]; i++) { %}
-    <tr class="template-download fade">
+{%! for (var i=0, file; file=o.files[i]; i++) { %}
+    <tr class="template-download fade" data-name="{%!=file.tempName %}" data-type="{%!=file.type %}">
         <td>
             <span class="preview">
-                {% ! if (file.thumbnailUrl) { %}
-                    <a href="{% !=file.url %}" title="{% !=file.name %}" download="{% !=file.name %}" data-gallery><img src="{% !=file.thumbnailUrl %}"></a>
-                {% ! } %}
+                {%! if (file.thumbnailUrl) { %}
+                    <a href="{%!=file.url %}" title="{%!=file.name %}" download="{%!=file.name %}" data-gallery><img src="{%!=file.thumbnailUrl %}"></a>
+                {%! } %}
             </span>
         </td>
         <td>
             <p class="name">
-                {% ! if (file.url) { %}
-                    <a href="{% !=file.url %}" title="{% !=file.name %}" download="{% !=file.name %}" {% !=file.thumbnailUrl?'data-gallery':'' %}>{% !=file.name %}</a>
-                {% ! } else { %}
-                    <span>{% !=file.name %}</span>
-                {% ! } %}
+                {%! if (file.url) { %}
+                    <a href="{%!=file.url %}" title="{%!=file.name %}" download="{%!=file.name %}" {%!=file.thumbnailUrl?'data-gallery':'' %}>{%!=file.name %}</a>
+                {%! } else { %}
+                    <span>{%!=file.name %}</span>
+                {%! } %}
             </p>
-            {% ! if (file.error) { %}
-                <div><span class="label label-danger">Error</span> {% !=file.error %}</div>
-            {% ! } %}
+            {%! if (file.error) { %}
+                <div><span class="label label-danger">Error</span> {%!=file.error %}</div>
+            {%! } %}
         </td>
         <td>
-            <span class="size">{% !=o.formatFileSize(file.size) %}</span>
+            <span class="size">{%!=o.formatFileSize(file.size) %}</span>
         </td>
         <td>
-            {% ! if (file.deleteUrl) { %}
-                <button class="btn btn-danger delete" data-type="{% !=file.deleteType %}" data-url="{% !=file.deleteUrl %}"{% ! if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% ! } %}>
+            {%! if (file.deleteUrl) { %}
+                <button class="btn btn-danger delete" data-type="{%!=file.deleteType %}" data-url="{%!=file.deleteUrl %}"{%! if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{%! } %}>
                     <i class="glyphicon glyphicon-trash"></i>
                     <span>Delete</span>
                 </button>
                 <input type="checkbox" name="delete" value="1" class="toggle">
-            {% ! } else { %}
+            {%! } else { %}
                 <button class="btn btn-warning cancel">
                     <i class="glyphicon glyphicon-ban-circle"></i>
                     <span>Cancel</span>
                 </button>
-            {% ! } %}
+            {%! } %}
         </td>
     </tr>
-{% ! } %}
+{%! } %}
 
 
 </script>
@@ -328,6 +349,6 @@
 <script src="../bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
 <script src="../bower_components/blueimp-file-upload/js/jquery.fileupload-ui.js"></script>
 
-<script src="../static/create_project.js"></script>
+{#<script src="../static/create_project.js"></script>#}
 </body>
 </html>

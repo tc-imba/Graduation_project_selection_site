@@ -80,7 +80,9 @@ class userDB(dbFunction):
     def query(self):
         return \
             self.dataQuery(
-                ("SELECT u_name, role, registed, stat, grouped, group_id, role, sex, phone, major FROM users WHERE id = %d" % self.uid))[0]
+                (
+                "SELECT u_name, role, registed, stat, grouped, group_id, role, sex, phone, major FROM users WHERE id = %d" % self.uid))[
+                0]
 
     def isLeader(self):
         res = self.dataQuery(("SELECT grouped FROM users WHERE id=%d" % self.uid))
@@ -334,8 +336,8 @@ class projectDB(dbFunction):
 
     def newProject(self, title, detail, img, sponsor='', instructor='', major='', files='[]'):
         op = (
-            "INSERT INTO projects VALUES (%d, '%s', '%s', '%s', '%s', '', '', '', 0, 0, 0, 0, 0, '%s', '%s', 'n')" % (
-                self.id, title, img, sponsor, detail, major, instructor))
+            "INSERT INTO projects VALUES (%d, '%s', '%s', '%s', '%s', '', '', '', 0, 0, 0, 0, 0, '%s', '%s', '%s', 'n')" % (
+                self.id, title, img, sponsor, detail, major, instructor, files))
         self.dataUpdate(op)
 
     def deleteProject(self):
@@ -365,9 +367,13 @@ class projectDB(dbFunction):
 
     def editProject(self, title, detail, img, sponsor, instructor, major, files='[]'):
         if img:
-            op = ("UPDATE projects SET title='%s', detail='%s', img='%s', sponsor='%s', instructor='%s', major='%s' WHERE id=%d" % (title, detail, img, sponsor, instructor, major, self.id))
+            op = (
+            "UPDATE projects SET title='%s', detail='%s', img='%s', sponsor='%s', instructor='%s', major='%s', files = '%s' WHERE id=%d" % (
+            title, detail, img, sponsor, instructor, major, files, self.id))
         else:
-            op = ("UPDATE projects SET title='%s', detail='%s', sponsor='%s', instructor='%s', major='%s' WHERE id=%d" % (title, detail, sponsor, instructor, major, self.id))
+            op = (
+            "UPDATE projects SET title='%s', detail='%s', sponsor='%s', instructor='%s', major='%s', files = '%s' WHERE id=%d" % (
+            title, detail, sponsor, instructor, major, files, self.id))
         self.dataUpdate(op)
 
     def assigned(self):

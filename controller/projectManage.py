@@ -28,7 +28,7 @@ class createProjectHandler(BaseHandler):
             detail = project['detail']
             isedit = "true"
         else:
-            project = {'instructor': '', 'sponsor': '', 'major': ''}
+            project = {'instructor': '', 'sponsor': '', 'major': '', 'files': '[]'}
             title = ''
             detail = ''
             isedit = 'false'
@@ -201,7 +201,7 @@ class uploadFileHandler(BaseHandler):
             im.thumbnail((THUMB_MAX_WIDTH, THUMB_MAX_HEIGHT))
             im.save('temp/thumb.' + filename_temp)
             thumbnail_key = 'temp/thumb.' + filename_temp
-        return key, thumbnail_key
+        return filename_temp, key, thumbnail_key,
 
     def handle_upload(self):
         results = []
@@ -213,8 +213,10 @@ class uploadFileHandler(BaseHandler):
                 'size': len(file.body)
             }
             if self.validate(result):
-                key, thumbnail_key = self.write_blob(file.body, result)
+                filename_temp, key, thumbnail_key = self.write_blob(file.body, result)
                 if key is not None:
+                    result['tempName'] = filename_temp
+                    result['type'] = 'temp'
                     result['url'] = base_url + '/' + key
                     result['deleteUrl'] = result['url']
                     result['deleteType'] = 'DELETE'
