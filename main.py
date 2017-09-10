@@ -132,6 +132,7 @@ if __name__ == "__main__":
         (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "static")}),
         (r'/img/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "img")}),
         (r'/temp/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "temp")}),
+        (r'/file/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "file")}),
         (r'/exported/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "exported")})
     ], debug=True, **settings)
     http_server = tornado.httpserver.HTTPServer(application)

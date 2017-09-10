@@ -339,8 +339,8 @@ class projectDB(dbFunction):
 
     def newProject(self, title, detail, img, sponsor='', instructor='', major='', files='[]'):
         op = (
-            "INSERT INTO projects VALUES (%d, '%s', '%s', '%s', '%s', '', '', '', 0, 0, 0, 0, 0, '%s', '%s', '%s', 'n')" % (
-                self.id, title, img, sponsor, detail, major, instructor, files))
+            "INSERT INTO projects VALUES (%d, '%s', '%s', '%s', '%s', '', '', '', 0, 0, 0, 0, 0, '%s', '%s', 'n')" % (
+                self.id, title, img, sponsor, detail, major, instructor))
         self.dataUpdate(op)
         return self.id
 
@@ -372,12 +372,12 @@ class projectDB(dbFunction):
     def editProject(self, title, detail, img, sponsor, instructor, major, files='[]'):
         if img:
             op = (
-                "UPDATE projects SET title='%s', detail='%s', img='%s', sponsor='%s', instructor='%s', major='%s', files = '%s' WHERE id=%d" % (
-                    title, detail, img, sponsor, instructor, major, files, self.id))
+                "UPDATE projects SET title='%s', detail='%s', img='%s', sponsor='%s', instructor='%s', major='%s' WHERE id=%d" % (
+                    title, detail, img, sponsor, instructor, major, self.id))
         else:
             op = (
-                "UPDATE projects SET title='%s', detail='%s', sponsor='%s', instructor='%s', major='%s', files = '%s' WHERE id=%d" % (
-                    title, detail, sponsor, instructor, major, files, self.id))
+                "UPDATE projects SET title='%s', detail='%s', sponsor='%s', instructor='%s', major='%s' WHERE id=%d" % (
+                    title, detail, sponsor, instructor, major, self.id))
         self.dataUpdate(op)
 
     def assigned(self):
@@ -401,11 +401,11 @@ class fileDB(dbFunction):
         return self.dataQuery(
             ("SELECT * FROM files WHERE id = %d" % self.id))[0]
 
-    def newFile(self, pid, name, temp_name, size):
-        op = ("INSERT INTO files VALUES ('%d', '%s', '%s', '%d')" %
-              (self.id, pid, name, temp_name, size))
+    def newFile(self, pid, name, sha1, size, thumbnail=0):
+        op = ("INSERT INTO files VALUES ('%d', '%d', '%s', '%s', '%d', '%d')" %
+              (self.id, int(pid), name, sha1, int(size), thumbnail))
         self.dataUpdate(op)
 
-    def deleteFile(self):
-        op = ("DELETE FROM projects WHERE id=%d" % self.id)
+    def deleteFile(self, sha1):
+        op = ("DELETE FROM projects WHERE sha1=%s" % sha1)
         self.dataUpdate(op)

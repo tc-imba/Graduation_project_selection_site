@@ -8,6 +8,7 @@ import re
 import urllib.parse
 import hashlib
 import json
+import random
 from util.env import *
 from PIL import Image
 
@@ -18,13 +19,28 @@ if env['port']:
 
 
 class createProjectHandler(BaseHandler):
+
+    def get_suffix(self, name):
+        pos = len(name) - name[::-1].find('.')
+        return name[pos:]
+
     @tornado.web.authenticated
     def get(self):
         uid = int(tornado.escape.xhtml_escape(self.current_user))
         pid = self.get_argument('id', default='')
         if pid:
             project = projectDB(int(pid)).query()
-            files = json.dumps(projectDB(int(pid)).getFiles())
+            files = projectDB(int(pid)).getFiles()
+            for file in files:
+                suffix = self.get_suffix(file['name'])
+                file['type'] = 'file'
+                file['url'] = base_url + ('/uploadfile?type=file&sha1=%s&suffix=%s' %
+                                          (file['sha1'], suffix))
+                file['deleteUrl'] = file['url']
+                file['deleteType'] = 'DELETE'
+                if file['thumbnail']:
+                    file['thumbnailUrl'] = base_url + ('/file/%s.thumb.%s' % (file['sha1'], suffix))
+            files = json.dumps(files)
             title = project['title']
             detail = project['detail']
             isedit = "true"
@@ -63,39 +79,36 @@ class createProjectHandler(BaseHandler):
             sponsor = self.get_argument("sponsor")
             instructor = self.get_argument("instructor")
             major = self.get_argument('major')
-            # new_files = self.get_argument('new_files', default='[]')
-            # old_files = self.get_argument('old_files', default='[]')
-            files = self.get_argument('files', default='[]')
             detail = detail.replace("'", "''")
             sponsor = sponsor.replace("'", "''")
             instructor = instructor.replace("'", "''")
             major = major.replace("'", "''")
             img = pic_name
-            files = json.loads(files)
 
             if isedit == "false":
-                pid = projectDB().newProject(title, detail, img, sponsor, instructor, major, files)
+                pid = projectDB().newProject(title, detail, img, sponsor, instructor, major)
             else:
                 pid = self.get_argument("pid")
-                projectDB(pid).editProject(title, detail, img, sponsor, instructor, major, files)
+                projectDB(pid).editProject(title, detail, img, sponsor, instructor, major)
 
-            for i in files:
-                if files[i].id > 0:
-                    # old files
-                    file = fileDB(files[i].id).query()
-                    if file.id != files[i].id:
-                        pass
-                else:
-                    # new files
-                    try:
-                        os.rename('temp/' + files[i].temp_name, 'files/' + files[i].temp_name)
-                    except FileNotFoundError:
-                        continue
-                    try:
-                        os.rename('temp/thumb.' + files[i].temp_name, 'files/thumb.' + files[i].temp_name)
-                    except FileNotFoundError:
-                        pass
-                    fileDB().newFile(pid, files[i].name, files[i].temp_name, files[i].size)
+            files = self.get_argument('files', default='[]')
+            files = json.loads(files)
+
+            for file in files:
+                try:
+                    size = os.path.getsize('temp/' + file['sha1'])
+                    os.rename('temp/' + file['sha1'], 'file/' + file['sha1'])
+                except FileNotFoundError:
+                    print(file)
+                    continue
+                try:
+                    suffix = self.get_suffix(file['name'])
+                    os.rename('temp/' + file['sha1'] + '.thumb.' + suffix,
+                              'file/' + file['sha1'] + '.thumb.' + suffix)
+                    thumbnail = 1
+                except FileNotFoundError:
+                    thumbnail = 0
+                fileDB().newFile(pid, file['name'], file['sha1'], size, thumbnail)
 
             self.clear_cookie("pic_name")
             self.write("success")
@@ -166,13 +179,16 @@ class detailHandler(BaseHandler):
         res = userDB(uid).query()
         isIn = id in res['registed']
         role = res['role']
+        files = projectDB(int(id)).getFiles()
+        for file in files:
+            file['url'] = base_url + '/files/' + file['sha1']
         self.render("detail.html", i=id, proj=proj, u_name=self.get_secure_cookie('u_name'), isIn=isIn, role=role,
-                    baseurl=base_url)
+                    baseurl=base_url, files=files)
 
 
 MIN_FILE_SIZE = 1  # 1B
 MAX_FILE_SIZE = 10485760  # 10MB
-IMAGE_TYPES = re.compile('image/(gif|p?jpeg|(x-)?png)')
+IMAGE_TYPES = re.compile('image/(gif|bmp|p?jpeg|(x-)?png)')
 # ACCEPT_FILE_TYPES = IMAGE_TYPES
 THUMB_MAX_WIDTH = 80
 THUMB_MAX_HEIGHT = 80
@@ -182,6 +198,10 @@ EXPIRATION_TIME = 300  # seconds
 
 class uploadFileHandler(BaseHandler):
     @tornado.web.authenticated
+    def get_suffix(self, name):
+        pos = len(name) - name[::-1].find('.')
+        return name[pos:]
+
     def validate(self, file):
         if file['size'] < MIN_FILE_SIZE:
             file['error'] = 'File is too small'
@@ -192,19 +212,22 @@ class uploadFileHandler(BaseHandler):
         return False
 
     def write_blob(self, data, info):
-        filename_temp = hashlib.sha1(data).hexdigest() + '.' + info['name']
-        file_path = 'temp/' + filename_temp
-        key = 'uploadfile?type=temp&key=' + filename_temp
-        thumbnail_key = None
+        sha1 = hashlib.sha1(data).hexdigest()
+        sha1 = hashlib.sha1((sha1 + str(random.random())).encode('utf8')).hexdigest()
+        # filename_temp = hashlib.sha1(data).hexdigest() + '.' + info['name']
+        file_path = 'temp/' + sha1
+        suffix = self.get_suffix(info['name'])
+        key = 'uploadfile?type=temp&sha1=%s&suffix=%s' % (sha1, suffix)
+        thumbnail_name = None
         file = open(file_path, 'wb')
         file.write(data)
         file.close()
         if IMAGE_TYPES.match(info['type']):
             im = Image.open(file_path)
             im.thumbnail((THUMB_MAX_WIDTH, THUMB_MAX_HEIGHT))
-            im.save('temp/thumb.' + filename_temp)
-            thumbnail_key = 'temp/thumb.' + filename_temp
-        return filename_temp, key, thumbnail_key,
+            thumbnail_name = 'temp/' + sha1 + '.thumb.' + suffix
+            im.save(thumbnail_name)
+        return sha1, key, thumbnail_name,
 
     def handle_upload(self):
         results = []
@@ -216,15 +239,15 @@ class uploadFileHandler(BaseHandler):
                 'size': len(file.body)
             }
             if self.validate(result):
-                filename_temp, key, thumbnail_key = self.write_blob(file.body, result)
+                sha1, key, thumbnail_name = self.write_blob(file.body, result)
                 if key is not None:
-                    result['tempName'] = filename_temp
+                    result['sha1'] = sha1
                     result['type'] = 'temp'
                     result['url'] = base_url + '/' + key
                     result['deleteUrl'] = result['url']
                     result['deleteType'] = 'DELETE'
-                    if thumbnail_key is not None:
-                        result['thumbnailUrl'] = base_url + '/' + thumbnail_key
+                    if thumbnail_name is not None:
+                        result['thumbnailUrl'] = base_url + '/' + thumbnail_name
                 else:
                     result['error'] = 'Failed to store uploaded file.'
             results.append(result)
@@ -234,26 +257,39 @@ class uploadFileHandler(BaseHandler):
         pass
 
     def get(self):
-        self.redirect(base_url)
+        sha1 = self.get_argument('sha1', default='')
+        _type = self.get_argument('type', default='temp')
+        filename = _type + '/' + sha1
+        with open(filename, 'rb') as f:
+            while True:
+                data = f.read()
+                if not data:
+                    break
+                self.write(data)
+        self.finish()
 
     def delete(self):
-        key = self.get_argument('key', default='')
+        sha1 = self.get_argument('sha1', default='')
+        suffix = self.get_argument('suffix', default='png')
         _type = self.get_argument('type', default='temp')
         try:
-            os.remove(_type + '/' + key)
-            os.remove(_type + '/thumb.' + key)
+            os.remove(_type + '/' + sha1)
+            os.remove(_type + '/' + sha1 + '.thumb.' + suffix)
         except FileNotFoundError:
             pass
-        result = {'key': key}
+        fileDB().deleteFile(sha1)
+        result = {'key': sha1}
         s = json.dumps(result)
         self.set_header('Content-Type', 'application/json')
         self.write(s)
+        self.finish()
 
     def post(self):
         result = {'files': self.handle_upload()}
         s = json.dumps(result)
         self.set_header('Content-Type', 'application/json')
         self.write(s)
+        self.finish()
 
 
 class uploadPicHandler(BaseHandler):
