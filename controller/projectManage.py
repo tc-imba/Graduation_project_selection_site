@@ -24,11 +24,13 @@ class createProjectHandler(BaseHandler):
         pid = self.get_argument('id', default='')
         if pid:
             project = projectDB(int(pid)).query()
+            files = json.dumps(projectDB(int(pid)).getFiles())
             title = project['title']
             detail = project['detail']
             isedit = "true"
         else:
-            project = {'instructor': '', 'sponsor': '', 'major': '', 'files': '[]'}
+            project = {'instructor': '', 'sponsor': '', 'major': ''}
+            files = '[]'
             title = ''
             detail = ''
             isedit = 'false'
@@ -38,7 +40,7 @@ class createProjectHandler(BaseHandler):
             self.render('403.html', u_name=u_name, role=role)
         else:
             self.render('create_project.html', u_name=u_name, proj=project, role=role, title=title, detail=detail,
-                        isedit=isedit, pid=pid, baseurl=base_url)
+                        isedit=isedit, pid=pid, baseurl=base_url, files=files)
 
     @tornado.web.authenticated
     def post(self):
@@ -61,39 +63,40 @@ class createProjectHandler(BaseHandler):
             sponsor = self.get_argument("sponsor")
             instructor = self.get_argument("instructor")
             major = self.get_argument('major')
-            new_files = self.get_argument('new_files', default='[]')
-            old_files = self.get_argument('old_files', default='[]')
+            # new_files = self.get_argument('new_files', default='[]')
+            # old_files = self.get_argument('old_files', default='[]')
+            files = self.get_argument('files', default='[]')
             detail = detail.replace("'", "''")
             sponsor = sponsor.replace("'", "''")
             instructor = instructor.replace("'", "''")
             major = major.replace("'", "''")
             img = pic_name
-
-            new_files = json.dumps(new_files)
-            old_files = json.dumps(old_files)
-            files = []
-            for i in new_files:
-                try:
-                    os.rename('temp/' + new_files[i], 'files/' + new_files[i])
-                except FileNotFoundError:
-                    continue
-                try:
-                    os.rename('temp/thumb.' + new_files[i], 'files/thumb.' + new_files[i])
-                except FileNotFoundError:
-                    pass
-                files.append(new_files[i])
-
-            for i in old_files:
-                if os.path.exists('files/' + old_files[i]):
-                    files.append(old_files[i])
-
-            files = json.dumps(files)
+            files = json.loads(files)
 
             if isedit == "false":
-                projectDB().newProject(title, detail, img, sponsor, instructor, major, files)
+                pid = projectDB().newProject(title, detail, img, sponsor, instructor, major, files)
             else:
                 pid = self.get_argument("pid")
                 projectDB(pid).editProject(title, detail, img, sponsor, instructor, major, files)
+
+            for i in files:
+                if files[i].id > 0:
+                    # old files
+                    file = fileDB(files[i].id).query()
+                    if file.id != files[i].id:
+                        pass
+                else:
+                    # new files
+                    try:
+                        os.rename('temp/' + files[i].temp_name, 'files/' + files[i].temp_name)
+                    except FileNotFoundError:
+                        continue
+                    try:
+                        os.rename('temp/thumb.' + files[i].temp_name, 'files/thumb.' + files[i].temp_name)
+                    except FileNotFoundError:
+                        pass
+                    fileDB().newFile(pid, files[i].name, files[i].temp_name, files[i].size)
+
             self.clear_cookie("pic_name")
             self.write("success")
 

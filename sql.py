@@ -81,7 +81,7 @@ class userDB(dbFunction):
         return \
             self.dataQuery(
                 (
-                "SELECT u_name, role, registed, stat, grouped, group_id, role, sex, phone, major FROM users WHERE id = %d" % self.uid))[
+                    "SELECT u_name, role, registed, stat, grouped, group_id, role, sex, phone, major FROM users WHERE id = %d" % self.uid))[
                 0]
 
     def isLeader(self):
@@ -309,6 +309,9 @@ class projectDB(dbFunction):
         else:
             self.id = int(id)
 
+    def getFiles(self):
+        return self.dataQuery(("SELECT * FROM files WHERE pid=%d" % self.id))
+
     def allProjects(self):
         return self.dataQuery(("SELECT * FROM projects"))
 
@@ -339,6 +342,7 @@ class projectDB(dbFunction):
             "INSERT INTO projects VALUES (%d, '%s', '%s', '%s', '%s', '', '', '', 0, 0, 0, 0, 0, '%s', '%s', '%s', 'n')" % (
                 self.id, title, img, sponsor, detail, major, instructor, files))
         self.dataUpdate(op)
+        return self.id
 
     def deleteProject(self):
         qry = self.query()
@@ -368,14 +372,40 @@ class projectDB(dbFunction):
     def editProject(self, title, detail, img, sponsor, instructor, major, files='[]'):
         if img:
             op = (
-            "UPDATE projects SET title='%s', detail='%s', img='%s', sponsor='%s', instructor='%s', major='%s', files = '%s' WHERE id=%d" % (
-            title, detail, img, sponsor, instructor, major, files, self.id))
+                "UPDATE projects SET title='%s', detail='%s', img='%s', sponsor='%s', instructor='%s', major='%s', files = '%s' WHERE id=%d" % (
+                    title, detail, img, sponsor, instructor, major, files, self.id))
         else:
             op = (
-            "UPDATE projects SET title='%s', detail='%s', sponsor='%s', instructor='%s', major='%s', files = '%s' WHERE id=%d" % (
-            title, detail, sponsor, instructor, major, files, self.id))
+                "UPDATE projects SET title='%s', detail='%s', sponsor='%s', instructor='%s', major='%s', files = '%s' WHERE id=%d" % (
+                    title, detail, sponsor, instructor, major, files, self.id))
         self.dataUpdate(op)
 
     def assigned(self):
         op = ("UPDATE projects SET assigned='y' WHERE id=%d" % self.id)
+        self.dataUpdate(op)
+
+
+class fileDB(dbFunction):
+    def __init__(self, id=0):
+        dbFunction.__init__(self)
+        if id == 0:
+            max = self.dataQuery(("SELECT MAX(id) FROM files"))[0]['MAX(id)']
+            if max:
+                self.id = max + 1
+            else:
+                self.id = 1
+        else:
+            self.id = int(id)
+
+    def query(self):
+        return self.dataQuery(
+            ("SELECT * FROM files WHERE id = %d" % self.id))[0]
+
+    def newFile(self, pid, name, temp_name, size):
+        op = ("INSERT INTO files VALUES ('%d', '%s', '%s', '%d')" %
+              (self.id, pid, name, temp_name, size))
+        self.dataUpdate(op)
+
+    def deleteFile(self):
+        op = ("DELETE FROM projects WHERE id=%d" % self.id)
         self.dataUpdate(op)

@@ -48,7 +48,7 @@
             });
 
             var $files = $('#fileupload .files');
-            var files = JSON.parse("{{ proj['files'] }}");
+            var files = JSON.parse("{{ files }}");
             for (var i = 0; i < files.length; i++) {
                 console.log(files[i]);
             }
