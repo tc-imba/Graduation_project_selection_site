@@ -1,8 +1,8 @@
--- MySQL dump 10.16  Distrib 10.1.26-MariaDB, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.19, for Linux (x86_64)
 --
--- Host: localhost    Database: ipp
+-- Host: 127.0.0.1    Database: ipp
 -- ------------------------------------------------------
--- Server version	10.1.26-MariaDB
+-- Server version	5.7.19-0ubuntu0.17.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,6 +14,34 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `files`
+--
+
+DROP TABLE IF EXISTS `files`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `files` (
+  `id` int(11) NOT NULL,
+  `pid` int(11) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `sha1` varchar(255) DEFAULT NULL,
+  `size` int(11) DEFAULT NULL,
+  `thumbnail` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `files`
+--
+
+LOCK TABLES `files` WRITE;
+/*!40000 ALTER TABLE `files` DISABLE KEYS */;
+INSERT INTO `files` VALUES (2,1,'*-0.jpg','15f7b61637db182b614a8c18590b487a2fcda46e',387627,1),(3,1,'*-1.jpg','8db9a80cda7256095dac78b0531f1ade1ba04158',157108,1),(4,1,'*-2.jpg','90af871c6e203dc3024147c68e649e605db08c2e',681622,1),(5,1,'*-3.jpg','8074cf20d6a03ae0f736e8be8a4d199fe12a40a5',157108,1),(6,1,'*-4.jpg','91a84349b26c70c90fb0b788306d2d5c26714b28',196509,1),(7,1,'*-5.jpg','0f60dcde7b7e5f23766bbbec61cb2c069eb2d64d',478405,1);
+/*!40000 ALTER TABLE `files` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `groups`
@@ -39,6 +67,7 @@ CREATE TABLE `groups` (
 
 LOCK TABLES `groups` WRITE;
 /*!40000 ALTER TABLE `groups` DISABLE KEYS */;
+INSERT INTO `groups` VALUES (1,'刘逸灏','',515370910207,'',0);
 /*!40000 ALTER TABLE `groups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -76,7 +105,7 @@ CREATE TABLE `projects` (
 
 LOCK TABLES `projects` WRITE;
 /*!40000 ALTER TABLE `projects` DISABLE KEYS */;
-INSERT INTO `projects` VALUES (1,'Microsoft Kinect Development','image1.jpg','Mr. Fu','Kinect (codenamed Project Natal during development) is a line of motion sensing input devices by Microsoft for Xbox 360 and Xbox One video game consoles and Windows PCs.\nBased around a webcam-style add-on peripheral, it enables users to control and interact with their console/computer without the need for a game controller, through a natural user interface using gestures and spoken commands.[10] The first-generation Kinect was first introduced in November 2010 in an attempt to broaden Xbox 360\'s audience beyond its typical gamer base.[11] A version for Windows was released on February 1, 2012.[6] Kinect competes with several motion controllers on other home consoles, such as Wii Remote Plus for Wii and Wii U, PlayStation Move/PlayStation Eye for PlayStation 3, and PlayStation Camera for PlayStation 4. Microsoft released the Kinect software development kit for Windows 7 on June 16, 2011.[12][13][14] This SDK was meant to allow developers to write Kinecting apps in C++/CLI, C#, or Visual Basic .NET.[15][16]','515370910214','','',29,-1,-1,0,0,'ECE','S.Luke','y'),(3,'DOTA','1493180543.8290882.jpg','VALVE','CN DOTA, BEST DOTA','515370910258,515370910103','515370910214','',13,0,0,-1,0,'ECE','LUKE','y'),(4,'JIxiesai','1493180579.7570398.png','YLM','Love live xLuke','','515370910097','',9,0,-1,0,0,'All','Luke','n'),(5,'Strong','1491322295.9400535.png','Luke','How to be strong as luke?','','','515370910097',4,0,0,0,0,'ECE','Luke','n'),(6,'Hello','1493181814.9792676.jpg','asdf','**hello**','','','515370910214',3,0,0,0,0,'ece','sdF','n');
+INSERT INTO `projects` VALUES (1,'Microsoft Kinect Development','image1.jpg','Mr. Fu','Kinect (codenamed Project Natal during development) is a line of motion sensing input devices by Microsoft for Xbox 360 and Xbox One video game consoles and Windows PCs.\nBased around a webcam-style add-on peripheral, it enables users to control and interact with their console/computer without the need for a game controller, through a natural user interface using gestures and spoken commands.[10] The first-generation Kinect was first introduced in November 2010 in an attempt to broaden Xbox 360\'s audience beyond its typical gamer base.[11] A version for Windows was released on February 1, 2012.[6] Kinect competes with several motion controllers on other home consoles, such as Wii Remote Plus for Wii and Wii U, PlayStation Move/PlayStation Eye for PlayStation 3, and PlayStation Camera for PlayStation 4. Microsoft released the Kinect software development kit for Windows 7 on June 16, 2011.[12][13][14] This SDK was meant to allow developers to write Kinecting apps in C++/CLI, C#, or Visual Basic .NET.[15][16]','515370910214','','',31,-1,-1,0,0,'ECE','S.Luke','y'),(3,'DOTA','1493180543.8290882.jpg','VALVE','CN DOTA, BEST DOTA','515370910258,515370910103','515370910214','',14,0,0,-1,0,'ECE','LUKE','y'),(4,'JIxiesai','1493180579.7570398.png','YLM','Love live xLuke','','515370910097','',10,0,-1,0,0,'All','Luke','n'),(5,'Strong','1491322295.9400535.png','Luke','How to be strong as luke?','','','515370910097',4,0,0,0,0,'ECE','Luke','n'),(6,'Hello','1493181814.9792676.jpg','asdf','**hello**','','','515370910214',3,0,0,0,0,'ece','sdF','n');
 /*!40000 ALTER TABLE `projects` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -109,7 +138,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('李冕','admin','n,n,n','123','0,0,0',50237,'n',0,13585904409,'ME','male'),('韩鹤鸣','stu','n,n,n','123','0,0,0',5143709133,'n',0,15800785519,'ECE','male'),('蔡童安','stu','n,n,n','123','0,0,0',515370910021,'n',0,123456789,'ECE','male'),('符晓浛','admin','n,n,n','123','0,0,0',515370910093,'n',0,1234567890,'ECE','male'),('朱景元','stu','n,4,5','123','0,1,1',515370910097,'n',0,18017101488,'ECE','male'),('陈俞翰','stu','3,n,n','123','2,0,0',515370910103,'n',0,15705791667,'ME','male'),('钱圣轶','stu','n,n,n','123','0,0,0',515370910143,'n',0,1234567890,'ECE','male'),('肖李然','stu','n,n,n','123','0,0,0',515370910155,'n',0,13333333333,'ECE','male'),('曾裕铭','stu','1,3,6','123','1,1,1',515370910214,'n',0,1,'ME','male'),('吴承刚','admin','n,n,n','123','0,0,0',515370910252,'n',0,123,'ECE','male'),('钟舒城','stu','n,n,n','123','0,0,0',515370910253,'n',0,15000408437,'ECE','male'),('陈亦轩','stu','3,n,n','123','2,0,0',515370910258,'n',0,123,'ME','male');
+INSERT INTO `users` VALUES ('李冕','admin','n,n,n','123','0,0,0',50237,'n',0,13585904409,'ME','male'),('韩鹤鸣','stu','n,n,n','123','0,0,0',5143709133,'n',0,15800785519,'ECE','male'),('蔡童安','stu','n,n,n','123','0,0,0',515370910021,'n',0,123456789,'ECE','male'),('符晓浛','admin','n,n,n','123','0,0,0',515370910093,'n',0,1234567890,'ECE','male'),('朱景元','stu','n,4,5','123','0,1,1',515370910097,'n',0,18017101488,'ECE','male'),('陈俞翰','stu','3,n,n','123','2,0,0',515370910103,'n',0,15705791667,'ME','male'),('钱圣轶','stu','n,n,n','123','0,0,0',515370910143,'n',0,1234567890,'ECE','male'),('肖李然','stu','n,n,n','123','0,0,0',515370910155,'n',0,13333333333,'ECE','male'),('刘逸灏','admin','n,n,n','123','0,0,0',515370910207,'l',1,18964688141,'ECE','male'),('曾裕铭','stu','1,3,6','123','1,1,1',515370910214,'n',0,1,'ME','male'),('吴承刚','admin','n,n,n','123','0,0,0',515370910252,'n',0,123,'ECE','male'),('钟舒城','stu','n,n,n','123','0,0,0',515370910253,'n',0,15000408437,'ECE','male'),('陈亦轩','stu','3,n,n','123','2,0,0',515370910258,'n',0,123,'ME','male');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -122,4 +151,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-09-07 11:31:03
+-- Dump completed on 2017-09-10 23:54:19
