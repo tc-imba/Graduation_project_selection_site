@@ -407,5 +407,6 @@ class fileDB(dbFunction):
         self.dataUpdate(op)
 
     def deleteFile(self, sha1):
-        op = ("DELETE FROM projects WHERE sha1=%s" % sha1)
+        print(sha1)
+        op = ("DELETE FROM files WHERE sha1 = '%s'" % sha1)
         self.dataUpdate(op)

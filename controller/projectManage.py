@@ -181,7 +181,7 @@ class detailHandler(BaseHandler):
         role = res['role']
         files = projectDB(int(id)).getFiles()
         for file in files:
-            file['url'] = base_url + '/files/' + file['sha1']
+            file['url'] = base_url + '/file/' + file['sha1']
         self.render("detail.html", i=id, proj=proj, u_name=self.get_secure_cookie('u_name'), isIn=isIn, role=role,
                     baseurl=base_url, files=files)
 
