@@ -10,31 +10,31 @@
     <link rel="stylesheet" href="../static/assign_projects.css">
     <script src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
     <script>
-        $(document).ready(function(){
+        $(document).ready(function () {
             {% for i in range(len(projs)) %}
-            $("#edit{{ i }}").click(function() {
-        var select = $(this).parents('.assign').find('.select-stu').find('.form-control');
-        var pid = {{ projs[i]['id'] }}; // 后端直接输
-        var result = [];
+            $("#edit{{ i }}").click(function () {
+                var select = $(this).parents('.assign').find('.select-stu').find('.form-control');
+                var pid = {{ projs[i]['id'] }}; // 后端直接输
+                var result = [];
 
-        select.each(function(index, option) {
-            var chosen = $(option).find(":selected").text();
-            if (chosen === "SELECT") {
-                return;
-            }
-            result.push(chosen);
-        });
+                select.each(function (index, option) {
+                    var chosen = $(option).find(":selected").text();
+                    if (chosen === "SELECT") {
+                        return;
+                    }
+                    result.push(chosen);
+                });
 
-        result = result.join(",");
+                result = result.join(",");
 
-        $.post("/assign", {
-            pid: pid,
-            usr_list: result
-        },function(data,status){
-            alert(data);
-        });
-        window.location.reload();
-    });
+                $.post("/assign", {
+                    pid: pid,
+                    usr_list: result
+                }, function (data, status) {
+                    alert(data);
+                });
+                window.location.reload();
+            });
             {% end %}
         });
     </script>
@@ -72,7 +72,7 @@
                         {% if role=='stu' %}
                         <li><a href="/registed">My Project</a></li>
                         {% else %}
-                        <li><a href="/export">Export data</a> </li>
+                        <li><a href="/export">Export data</a></li>
                         {% end %}
                         <li><a href="/logout">Log out</a></li>
                         {% if role=='stu' %}
@@ -89,64 +89,70 @@
     </div>
 </nav>
 <div class="container">
-  <div class="projects">
-      <h3>After assigning one project, the others who chosen the same project will be rejected. The assigned person will leave his group after assigned and all other choice of him will be rejected.<br>All actions can't be redo.</h3>
-    {% for i in range(len(projs)) %}
-      {% if projs[i]['assigned'] == 'n' %}
-    <div class="single-proj">
-      <div class="overview row">
-        <div class="img col-md-3">
-          <a href="#">
-            <img class="thumbnail img-responsive" src="/img/{{ projs[i]['img'] }}">
-          </a>
-        </div>
-        <div class="title col-md-3">
-          <p> {{ projs[i]['title'] }} </p>
-        </div>
-        <div class="allgroups col-md-6">
-          {% for j in range(3) %}
-          <div class="somegro">
-            <ul>
-                <li>Preference {{ j + 1 }}:</li>
-              {% for grp in projs[i]['grpwish%s' % str(j + 1)] %}
-                    <li>Group: {{ grp }}</li>
-                {% end %}
-                {% for indiv in projs[i]['indivwish%s' % str(j + 1)] %}
-                    <li>{{ indiv }}</li>
-                {% end %}
-            </ul>
-          </div>
-            {% end %}
-        </div>
-      </div>
-      <div class="assign row">
-        <div class="col-md-10">
-          <div class="label-assign">
-            <label>Assign:</label>
-          </div>
-          <div class="select">
-            <form role="form">
-                {% for k in range(5) %}
-              <div class="form-group select-stu">
-                <select class="form-control">
-                  <option>SELECT</option>
-                    {% for usr in all_usr %}
-                        <option>{{ usr['u_name'] }}-{{ usr['id'] }}</option>
+    <div class="projects">
+        <h3>After assigning one project, the others who chosen the same project will be rejected. The assigned person
+            will leave his group after assigned and all other choice of him will be rejected.<br>All actions can't be
+            redo.</h3>
+        {% for i in range(len(projs)) %}
+{#        {% if projs[i]['assigned'] == 'n' %}#}
+        <div class="single-proj">
+            <div class="overview row">
+                <div class="img col-md-3">
+                    <a href="#">
+                        <img class="thumbnail img-responsive" src="/img/{{ projs[i]['img'] }}">
+                    </a>
+                </div>
+                <div class="title col-md-3">
+                    <p> {{ projs[i]['title'] }} </p>
+                </div>
+                <div class="allgroups col-md-6">
+                    {% for j in range(3) %}
+                    <div class="somegro">
+                        <ul>
+                            <li>Preference {{ j + 1 }}:</li>
+                            {% for grp in projs[i]['grpwish%s' % str(j + 1)] %}
+                            <li>Group: {{ grp }}</li>
+                            {% end %}
+                            {% for indiv in projs[i]['indivwish%s' % str(j + 1)] %}
+                            <li>{{ indiv }}</li>
+                            {% end %}
+                        </ul>
+                    </div>
                     {% end %}
-                </select>
-              </div>
-                {% end %}
-            </form>
-          </div>
+                </div>
+            </div>
+            <div class="assign row">
+                <div class="col-md-10">
+                    <div class="label-assign">
+                        <label>Assign:</label>
+                    </div>
+                    <div class="select">
+                        <form role="form">
+                            {% for k in range(5) %}
+                            <div class="form-group select-stu">
+                                <select class="form-control" {% if projs[i]['assigned'] != 'n' %}disabled{% end %}>
+                                    <option>SELECT</option>
+                                    {% for usr in all_usr %}
+                                    <option>{{ usr['u_name'] }}-{{ usr['id'] }}</option>
+                                    {% end %}
+                                </select>
+                            </div>
+                            {% end %}
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-2 comfirm">
+                    {% if projs[i]['assigned'] == 'n' %}
+                    <button class="btn btn-primary" id="edit{{ i }}">Confirm Edit</button>
+                    {% else %}
+                    <button class="btn btn-warning" id="reset{{ i }}">Reset</button>
+                    {% end %}
+                </div>
+            </div>
         </div>
-        <div class="col-md-2 comfirm">
-          <button class="btn btn-primary" id="edit{{ i }}">Confirm Edit</button>
-        </div>
-      </div>
+{#        {% end %}#}
+        {% end %}
     </div>
-      {% end %}
-      {% end %}
-  </div>
 </div>
 <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>

@@ -19,7 +19,6 @@ if env['port']:
 
 
 class createProjectHandler(BaseHandler):
-
     def get_suffix(self, name):
         pos = len(name) - name[::-1].find('.')
         return name[pos:]
@@ -338,6 +337,7 @@ class assignProjHandler(BaseHandler):
         role = userDB(uid).query()['role']
         u_name = self.get_secure_cookie('u_name').decode('UTF-8')
         projs = projectDB().allProjects()
+        print(projs)
         alu = userDB(uid).allUsers()
         all_usr = []
         for usr in alu:
@@ -381,31 +381,62 @@ class assignProjHandler(BaseHandler):
             self.finish("not authorized")
         res = self.get_argument("usr_list")
         pid = self.get_argument("pid")
-        pdb = projectDB(int(pid))
-        data = pdb.query()
-        for i in range(3):
-            old_usrs = data['wish%d' % (i + 1)].split(',')
-            for old_usr in old_usrs:
-                if not old_usr:
-                    continue
-                udb = userDB(int(old_usr))
-                udata = udb.query()
-                if udata['grouped'] == 'y':
-                    continue
-                else:
-                    quit_res = udata['registed'].replace(str(pid), 'n')
-                    udb.register(quit_res)
-        filter = re.compile(r'.+-(\d+)')
-        for usr in res.split(','):
-            if not usr:
-                continue
-            uid = int(filter.match(usr).group(1))
-            usr_db = userDB(uid)
-            if usr_db.isLeader():
-                usr_db.leaderQuit()
-            elif usr_db.isGrouped():
-                usr_db.quitGroup()
-            usr_db.register('%d,n,n' % int(pid))
-            usr_db.verify()
-        pdb.assigned()
+
+        projects = projectDB().allProjects()
+        assigned_students = []
+        for project in projects:
+            if project['assigned_students'] and project['assigned'] == 'y':
+                assigned_students += project['assigned_students'].split(',')
+
+        # print(assigned_students)
+
+        new_students = []
+        uid_filter = re.compile(r'.+-(\d+)')
+        if res:
+            for usr in res.split(','):
+                uid_str = uid_filter.match(usr).group(1)
+                uid = int(uid_str)
+                print(uid_str)
+                try:
+                    pos = assigned_students.index(uid_str)
+                    self.finish('fail')
+                except ValueError:
+                    # baocuo
+                    new_students.append(uid)
+
+        print(new_students)
+
+        for student in new_students:
+            udb = userDB(student)
+            
+
+
+        # pdb = projectDB(int(pid))
+        # data = pdb.query()
+        # for i in range(3):
+        #     old_usrs = data['wish%d' % (i + 1)].split(',')
+        #     for old_usr in old_usrs:
+        #         if not old_usr:
+        #             continue
+        #         udb = userDB(int(old_usr))
+        #         udata = udb.query()
+        #         if udata['grouped'] == 'y':
+        #             continue
+        #         else:
+        #             quit_res = udata['registed'].replace(str(pid), 'n')
+        #             udb.register(quit_res)
+        # filter = re.compile(r'.+-(\d+)')
+        # for usr in res.split(','):
+        #     if not usr:
+        #         continue
+        #     uid = int(filter.match(usr).group(1))
+        #     usr_db = userDB(uid)
+        #     if usr_db.isLeader():
+        #         usr_db.leaderQuit()
+        #     elif usr_db.isGrouped():
+        #         usr_db.quitGroup()
+        #     usr_db.register('%d,n,n' % int(pid))
+        #     usr_db.verify()
+        # pdb.assigned()
+
         self.finish('success')
