@@ -11,10 +11,10 @@
     <script src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
     <script>
         $(document).ready(function () {
-            {% for i in range(len(projs)) %}
-            $("#edit{{ i }}").click(function () {
+            $(".btn-submit").click(function (e) {
                 var select = $(this).parents('.assign').find('.select-stu').find('.form-control');
-                var pid = {{ projs[i]['id'] }}; // 后端直接输
+                var pid = $(this).data('id');
+                var assigned = $(this).data('assigned');
                 var result = [];
 
                 select.each(function (index, option) {
@@ -29,13 +29,14 @@
 
                 $.post("/assign", {
                     pid: pid,
-                    usr_list: result
+                    usr_list: result,
+                    reset: assigned === 'y' ? 1 : 0
                 }, function (data, status) {
-                    alert(data);
+                    //alert(data);
                 });
                 window.location.reload();
             });
-            {% end %}
+
         });
     </script>
 </head>
@@ -93,31 +94,40 @@
         <h3>After assigning one project, the others who chosen the same project will be rejected. The assigned person
             will leave his group after assigned and all other choice of him will be rejected.<br>All actions can't be
             redo.</h3>
-        {% for i in range(len(projs)) %}
-{#        {% if projs[i]['assigned'] == 'n' %}#}
+        {% for id in projects %}
+        {#        {% if projs[i]['assigned'] == 'n' %}#}
         <div class="single-proj">
             <div class="overview row">
                 <div class="img col-md-3">
                     <a href="#">
-                        <img class="thumbnail img-responsive" src="/img/{{ projs[i]['img'] }}">
+                        <img class="thumbnail img-responsive" src="/img/{{ projects[id]['img'] }}">
                     </a>
                 </div>
                 <div class="title col-md-3">
-                    <p> {{ projs[i]['title'] }} </p>
+                    <p> {{ projects[id]['title'] }} </p>
                 </div>
                 <div class="allgroups col-md-6">
+                    {% if projects[id]['assigned'] == 'y' %}
+
+                    {% else %}
                     {% for j in range(3) %}
                     <div class="somegro">
                         <ul>
                             <li>Preference {{ j + 1 }}:</li>
-                            {% for grp in projs[i]['grpwish%s' % str(j + 1)] %}
-                            <li>Group: {{ grp }}</li>
+                            {% for users in projects[id]['wish'][j] %}
+                            {% if len(users) <= 1 %}
+                            <li>{{ users[0]['u_name'] }}</li>
+                            {% else %}
+                            <li>Group:
+                                {% for user in users %}
+                                {{ user['u_name'] }}
+                                {% end %}
+                            </li>
                             {% end %}
-                            {% for indiv in projs[i]['indivwish%s' % str(j + 1)] %}
-                            <li>{{ indiv }}</li>
                             {% end %}
                         </ul>
                     </div>
+                    {% end %}
                     {% end %}
                 </div>
             </div>
@@ -130,27 +140,38 @@
                         <form role="form">
                             {% for k in range(5) %}
                             <div class="form-group select-stu">
-                                <select class="form-control" {% if projs[i]['assigned'] != 'n' %}disabled{% end %}>
+                                {% if projects[id]['assigned'] == 'y' %}
+                                <select class="form-control" disabled>
+                                    {% if k < len(projects[id]['users']) %}
+                                    <option>{{ projects[id]['users'][k] }}</option>
+                                    {% else %}
+                                    <option></option>
+                                    {% end %}
+                                </select>
+                                {% else %}
+                                <select class="form-control">
                                     <option>SELECT</option>
-                                    {% for usr in all_usr %}
+                                    {% for usr in students %}
                                     <option>{{ usr['u_name'] }}-{{ usr['id'] }}</option>
                                     {% end %}
                                 </select>
+                                {% end %}
                             </div>
+
                             {% end %}
                         </form>
                     </div>
                 </div>
                 <div class="col-md-2 comfirm">
-                    {% if projs[i]['assigned'] == 'n' %}
-                    <button class="btn btn-primary" id="edit{{ i }}">Confirm Edit</button>
+                    {% if projects[id]['assigned'] == 'y' %}
+                    <button class="btn btn-submit btn-warning" data-id="{{ id }}" data-assigned="y">Reset</button>
                     {% else %}
-                    <button class="btn btn-warning" id="reset{{ i }}">Reset</button>
+                    <button class="btn btn-submit btn-primary" data-id="{{ id }}" data-assigned="n">Confirm</button>
                     {% end %}
                 </div>
             </div>
         </div>
-{#        {% end %}#}
+        {#        {% end %}#}
         {% end %}
     </div>
 </div>

@@ -12,6 +12,7 @@ from util.pyxlsx import *
 from controller.account import *
 from controller.groupManage import *
 from controller.projectManage import *
+from controller.fileManage import *
 from util.env import *
 
 env = get_env()
@@ -23,7 +24,12 @@ class WelcomeHandler(BaseHandler):
         uid = int(tornado.escape.xhtml_escape(self.current_user))
         u_name = self.get_secure_cookie('u_name').decode('UTF-8')
         projs = projectDB().allProjects()
-        role = userDB(uid).query()['role']
+        udb = userDB(uid)
+        if udb.u_name == '':
+            self.redirect('/login?next=/')
+            return
+            # self.finish()
+        role = udb.query()['role']
         sort = self.get_argument('sort', default='')
         name = self.get_argument('name', default='')
         i = 0
@@ -44,14 +50,15 @@ class WelcomeHandler(BaseHandler):
             if sort == 'down':
                 projs.reverse()
         for proj in projs:
-            for i in range(3):
-                k = 0
-                for mem in proj['wish%d' % (i + 1)].split(','):
-                    if not mem:
-                        continue
-                    if userDB(int(mem)).isLeader():
-                        k += 1
-                proj['chosen_num%d' % (i + 1)] = k
+            proj['num'] = projectDB(proj['id']).selectNum()
+            # for i in range(3):
+            #     k = 0
+            #     for mem in proj['wish%d' % (i + 1)].split(','):
+            #         if not mem:
+            #             continue
+            #         if userDB(int(mem)).isLeader():
+            #             k += 1
+            #     proj['chosen_num%d' % (i + 1)] = k
         self.render('index.html', u_name=u_name, projs=projs, role=role, sort=sort, flt='')
 
 
@@ -62,14 +69,15 @@ class filterHandler(BaseHandler):
         u_name = self.get_secure_cookie('u_name').decode('UTF-8')
         projs = projectDB().allProjects()
         for proj in projs:
-            for i in range(3):
-                k = 0
-                for mem in proj['wish%d' % (i + 1)].split(','):
-                    if not mem:
-                        continue
-                    if userDB(int(mem)).isLeader():
-                        k += 1
-                proj['chosen_num%d' % (i + 1)] = k
+            proj['num'] = projectDB(proj['id']).selectNum()
+            # for i in range(3):
+            #     k = 0
+            #     for mem in proj['wish%d' % (i + 1)].split(','):
+            #         if not mem:
+            #             continue
+            #         if userDB(int(mem)).isLeader():
+            #             k += 1
+            #     proj['chosen_num%d' % (i + 1)] = k
         if flt != 'other':
             projs = filter(lambda proj: proj['major'].lower() == flt, projs)
         else:
@@ -114,7 +122,7 @@ if __name__ == "__main__":
         (r"/registed", registedHandler),  # for students to view their projects
         (r"/register", registerHandler),  # for students to regist projects
         (r"/userregister", UserRegisterHandler),
-        (r"/quit", quitProj),  # for students to quit projects
+        (r"/quit", quitHandler),  # for students to quit projects
         (r"/joinGroup", joinGroupHandler),  # for team leader to set groups
         (r"/option", optionHandler),  # for viewing the account status
         (r"/export", exportHandler),  # for exporting the choosing data
@@ -123,7 +131,7 @@ if __name__ == "__main__":
         (r"/uploadfile", uploadFileHandler),
         (r"/uploadPic", uploadPicHandler),
         (r"/deleteProj", deleteProjHandler),
-        (r"/assign", assignProjHandler),
+        (r"/assign", assignHandler),
         (r"/member/([0-9]+)", memberHandler),
         (r"/filter/([a-z]+)", filterHandler),
         (r"/jalogin", jaloginHandler),

@@ -1,27 +1,17 @@
 #!/bin/bash
 
-echo "Database name:"
-read dbName
-echo "Username:"
-read username
-echo "Password:"
-read -s pwd
-echo "Server port:"
-read port
-echo "Domain name:(\"http://\" is required)"
-read domain
+apt-get install python3-pil
+pip3 install tornado openpyxl PyYaml
 
-cat << EOF > config.yaml
-# database
-database: $dbName
-user: $username
-password: $pwd
+if ! python3 -c "import mysql.connector" > /dev/null 2>&1; then
+    wget https://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.5.tar.gz
+    tar -zxf mysql-connector-python-2.1.5.tar.gz
+    (
+        cd mysql-connector-python-2.1.5
+        python3 setup.py install
+    )
+fi
 
-# dev-server
-port: $port
-domain: $domain
-EOF
 
-pip3 install tornado openpyxl PyYaml mysql-connector-python
 
-mysql -u"$username" -p"$password" "$dbName" < ./sample.dump
+#mysql -u"$username" -p"$password" "$dbName" < ./sample.dump

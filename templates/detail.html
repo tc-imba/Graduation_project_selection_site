@@ -24,7 +24,7 @@
                         pref: chosen
                     },
                     function (data, status) {
-                        alert(data);
+                        //alert(data);
                     });
                 window.location.reload();
             });
@@ -34,7 +34,7 @@
                         id: {{ i }}
                     },
                     function (data, status) {
-                        alert(data);
+                        //alert(data);
                     });
                 window.location.reload();
             });
@@ -47,7 +47,7 @@
                         id: {{ i }}
                     },
                     function (data, status) {
-                        alert(data);
+                        //alert(data);
                     });
                 window.location = "{{ baseurl }}";
             });
@@ -126,6 +126,7 @@
             </div>
             <div class="col-md-4">
                 {% if role=='stu' %}
+                {% if grouped != 'y' %}
                 {% if isIn==False %}
                 <div class="project-submit">
                     <button class="btn btn-primary" data-toggle="modal" data-target="#register-modal"
@@ -170,6 +171,7 @@
                     <button class="btn btn-primary" id="quit" style="margin-bottom: 20px;">Quit the Project</button>
                 </div>
                 {% end %}
+                {% end %}
                 {% else %}
                 <div class="project-submit">
                     <button class="btn btn-primary" id="edit" style="margin-bottom: 20px;">Edit the Project</button>
@@ -198,15 +200,9 @@
 
                     <!-- List group -->
                     <ul class="list-group">
-                        <li class="list-group-item">{{ proj['chosen_num1'] }} groups, {{ person_num(proj['wish1']) }}
-                            students
-                        </li>
-                        <li class="list-group-item">{{ proj['chosen_num2'] }} groups, {{ person_num(proj['wish2']) }}
-                            students
-                        </li>
-                        <li class="list-group-item">{{ proj['chosen_num3'] }} groups, {{ person_num(proj['wish3']) }}
-                            students
-                        </li>
+                        <li class="list-group-item">First choice:<br> {{ num[0][1] }} group(s), totally {{ num[0][0] }} student(s)</li>
+                        <li class="list-group-item">Second Choice:<br> {{ num[1][1] }} group(s), totally {{ num[1][0] }} student(s)</li>
+                        <li class="list-group-item">Third Choice:<br> {{ num[2][1] }} group(s), totally {{ num[2][0] }} student(s)</li>
                     </ul>
                 </div>
             </div>

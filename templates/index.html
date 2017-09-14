@@ -152,13 +152,13 @@
                     <p>{{ item['instructor'] }}</p>
                 </div>
                 <div class="col-md-2">
-                    <p>{{ item['chosen_num1'] }} Groups, {{ person_num(item['wish1']) }} students</p>
+                    <p>{{ item['num'][0][1] }} group(s), {{ item['num'][0][0] }} student(s)</p>
                 </div>
                 <div class="col-md-2">
-                    <p>{{ item['chosen_num2'] }} Groups, {{ person_num(item['wish2']) }} students</p>
+                    <p>{{ item['num'][1][1] }} group(s), {{ item['num'][1][0] }} student(s)</p>
                 </div>
                 <div class="col-md-2">
-                    <p>{{ item['chosen_num3'] }} Groups, {{ person_num(item['wish3']) }} students</p>
+                    <p>{{ item['num'][2][1] }} group(s), {{ item['num'][2][0] }} student(s)</p>
                 </div>
                 <div class="col-md-1">
                     <p>{{ item['sponsor'] }}</p>

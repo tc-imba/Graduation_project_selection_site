@@ -107,18 +107,29 @@ class registedHandler(BaseHandler):
         res = user.query()
         role = res['role']
         u_name = user.u_name
-        registed = res['registed'].split(',')
+        registed = [res['wish0'], res['wish1'], res['wish2']]  # res['registed'].split(',')
         statstr = []
         projid = []
-        stat = res['stat'].split(',')
+        stat = [0, 0, 0]  # res['stat'].split(',')
         for i in range(3):
-            if registed[i] == 'n':
-                registed[i] = 'None'
-                projid.append(0)
+            if res['pid'] == 0:
+                if res['wish' + str(i)] == 0:
+                    stat[i] = 0
+                else:
+                    stat[i] = 1
+            elif res['pid'] == res['wish' + str(i)]:
+                stat[i] = 2
             else:
-                proj = projectDB(int(registed[i])).query()
+                stat[i] = 3
+
+        for i in range(3):
+            proj = projectDB(int(registed[i])).query()
+            if proj:
                 registed[i] = proj['title']
                 projid.append(proj['id'])
+            else:
+                registed[i] = 'None'
+                projid.append(0)
             if int(stat[i]) == 0:
                 statstr.append('Not chosen yet')
             if int(stat[i]) == 1:
@@ -132,7 +143,7 @@ class registedHandler(BaseHandler):
             self.render('403.html', u_name=u_name, role=role)
         else:
             self.render("registed.html", registed=registed, u_name=u_name,
-                        stat=stat, role=role, statstr=statstr, projid=projid)
+                        stat=stat, role=role, statstr=statstr, projid=projid, grouped=res['grouped'])
 
 
 class forbiddenHandler(BaseHandler):

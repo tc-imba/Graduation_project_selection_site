@@ -18,7 +18,7 @@
                         method: "join"
                     },
                     function(data,status){
-                    alert(data);
+                    //alert(data);
                 });
                 window.location.reload();
             });
@@ -28,7 +28,7 @@
                         method: "quit"
                     },
                     function(data,status){
-                    alert(data);
+                    //alert(data);
                 });
                 window.location.reload();
             });
@@ -38,7 +38,7 @@
                         method: "create"
                     },
                     function(data,status){
-                    alert(data);
+                    //alert(data);
                 });
                 window.location.reload();
             });
@@ -151,29 +151,33 @@
             </tr>
             </thead>
             <tbody>
-            {% for i in range(l) %}
+            {% set id = 0 %}
+            {% for i in groups %}
             <tr>
-                <td>{{ i + 1 }}</td>
+                {% set id = id + 1%}
+                <td>{{ id }}</td>
                 <td>
+                    {% if groups[i]['leader'] %}
                     {% if role == 'admin' %}
-                    <a href="/member/{{ groups[i]['leader_id'] }}"> {{ groups[i]['leader'] }}</a>
+                    <a href="/member/{{ groups[i]['leader']['id'] }}"> {{ groups[i]['leader']['u_name'] }}</a>
                     {% else %}
-                    {{ groups[i]['leader'] }}
+                    {{ groups[i]['leader']['u_name'] }}
+                    {% end %}
                     {% end %}
                 </td>
-                <td>{% for j in range(len(split(groups[i]['users']))) %}
+                <td>{% for user in groups[i]['members'] %}
                     {% if role == 'admin' %}
-                    <a href="/member/{{ split(groups[i]['user_id'])[j] }}"> {{ split(groups[i]['users'])[j] }}</a>
+                    <a href="/member/{{ user['id'] }}"> {{ user['u_name'] }}</a>&nbsp;
                     {% else %}
-                    {{ split(groups[i]['users'])[j] }}
+                    {{ user['u_name'] }}&nbsp;
                     {% end %}
-                    <br>
+{#                    <br>#}
                     {% end %}
                 </td>
                 {% if role == 'stu' %}
                 <td>
-                    {% if gid != groups[i]['id'] %}
-                    {% if groups[i]['isFull'] %}
+                    {% if gid != i %}
+                    {% if len(groups[i]['members']) >= 4 %}
                   <button class="btn btn-success" disabled="disabled">Full</button>
                     {% else %}
                   <button class="btn btn-success" data-toggle="modal" data-target="#join-modal">Join</button>
@@ -189,7 +193,7 @@
                         </div>
                         <div class="modal-footer" align="center">
                           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                          <button type="button" class="btn btn-primary" value={{ groups[i]['id'] }} id="join">Confirm</button>
+                          <button type="button" class="btn btn-primary" value={{ i }} id="join">Confirm</button>
                         </div>
                       </div>
                     </div>
