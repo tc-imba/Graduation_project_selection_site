@@ -58,7 +58,7 @@ class LoginHandler(BaseHandler):
 
 class UserRegisterHandler(BaseHandler):
     def get(self):
-        self.render('register.html')
+        self.render('register.html', nav='')
 
     def post(self):
         major = self.get_argument('major')
