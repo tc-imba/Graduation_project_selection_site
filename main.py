@@ -112,7 +112,7 @@ if __name__ == "__main__":
         "template_path": os.path.join(os.path.dirname(__file__), "templates"),
         "cookie_secret": "bZJc2sWbQLKos6GkHn/VB9oXwQt8S0R0kRvJ5/xJ89E=",
         "login_url": "/login",
-        "ui_methods": util.func
+        "ui_methods": util.func,
     }
     application = tornado.web.Application([
         (r'/', WelcomeHandler),  # the home page
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         (r'/temp/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "temp")}),
         (r'/file/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "file")}),
         (r'/exported/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), "exported")})
-    ], debug=True, **settings)
+    ], debug=False, **settings)
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()

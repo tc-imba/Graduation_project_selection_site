@@ -6,6 +6,7 @@ import tornado.ioloop
 import tornado.web
 from controller.account import *
 
+
 def style_range(ws, cell_range, border=Border(), fill=None, font=None, alignment=None):
     top = Border(top=border.top)
     left = Border(left=border.left)
@@ -44,36 +45,68 @@ def multiCell(ws, value, rng, b=False, color="000000", horizontal="center", vert
     style_range(ws, rng, font=font, alignment=al)
 
 
-def export(data, output):
+def export(projects, isolate_user, output):
     wb = Workbook()
     ws = wb.active
     multiCell(ws, "Proj. No.", "A1:A2")
     multiCell(ws, "Title", "B1:B2")
-    multiCell(ws, "Preference", "C1:E1")
-    for i in range(3):
-        cell = ws["%s2" % chr(ord('C') + i)]
-        cell.value = i + 1
-        cell.alignment = Alignment(horizontal="center", vertical="center")
-    end_of_project_cell = 2
-    end_of_group_cell = [2, 2, 2]
-    for project in data:
-        if project['groups'][0] or project['groups'][1] or project['groups'][2]:
-            for i in range(3):
-                pref = project['groups'][i]
-                if pref:
-                    for group in pref:
-                        for student in group:
-                            end_of_group_cell[i] += 1
-                            ws['%s%d' % (chr(67 + i), end_of_group_cell[i])] = student
-                        end_of_group_cell[i] += 1
-            tmp = max(end_of_group_cell) + 2
-            multiCell(ws, project['i'], "A%d:A%d" % (end_of_project_cell + 1, tmp))
-            multiCell(ws, project['title'], "B%d:B%d" % (end_of_project_cell + 1, tmp))
-            for i in range(3):
-                end_of_group_cell[i] = tmp
-            end_of_project_cell = tmp
+    multiCell(ws, "Student", "C1:C2")
+
+    # for i in range(3):
+    #     cell = ws["%s2" % chr(ord('C') + i)]
+    #     cell.value = i + 1
+    #     cell.alignment = Alignment(horizontal="center", vertical="center")
+
+    def writeCell(col, row, text):
+        ws["%s%d" % (col, row)] = text
+
+    def writeMultiCell(col1, row1, col2, row2, text):
+        multiCell(ws, text, "%s%d:%s%d" % (col1, row1, col2, row2))
+
+    row = 3
+    project_num = 1
+    print(projects)
+    for project in projects:
+        if len(project['users']) == 0:
+            height = 0
+        else:
+            height = len(project['users']) - 1
+        writeMultiCell('A', row, 'A', row + height, project_num)
+        writeMultiCell('B', row, 'B', row + height, project['title'])
+        for user in project['users']:
+            writeCell('C', row, user['u_name'])
+            row = row + 1
+        if len(project['users']) == 0:
+            row = row + 1
+        project_num = project_num + 1
+
+    writeCell('A', row, 'Not assigned')
+    for user in isolate_user:
+        writeCell('C', row, user['u_name'])
+        row = row + 1
+
+
+        # end_of_project_cell = 2
+    # end_of_group_cell = [2, 2, 2]
+    # for project in data:
+    #     if project['groups'][0] or project['groups'][1] or project['groups'][2]:
+    #         for i in range(3):
+    #             pref = project['groups'][i]
+    #             if pref:
+    #                 for group in pref:
+    #                     for student in group:
+    #                         end_of_group_cell[i] += 1
+    #                         ws['%s%d' % (chr(67 + i), end_of_group_cell[i])] = student
+    #                     end_of_group_cell[i] += 1
+    #         tmp = max(end_of_group_cell) + 2
+    #         multiCell(ws, project['i'], "A%d:A%d" % (end_of_project_cell + 1, tmp))
+    #         multiCell(ws, project['title'], "B%d:B%d" % (end_of_project_cell + 1, tmp))
+    #         for i in range(3):
+    #             end_of_group_cell[i] = tmp
+    #         end_of_project_cell = tmp
 
     wb.save(output)
+
 
 class exportHandler(BaseHandler):
     @tornado.web.authenticated
@@ -81,7 +114,7 @@ class exportHandler(BaseHandler):
         uid = int(tornado.escape.xhtml_escape(self.current_user))
         role = userDB(uid).query()['role']
         u_name = self.get_secure_cookie('u_name').decode('UTF-8')
-        if role=='stu':
+        if role == 'stu':
             self.render('403.html', u_name=u_name, role=role)
         else:
             self.render('export.html', u_name=u_name, role=role, nav='')
@@ -96,34 +129,44 @@ class exportHandler(BaseHandler):
         if '/' in output:
             self.write("illegal file name")
             return
+
         res = projectDB().allProjects()
-        for i in range(len(res)):
-            all_grp = []
-            for k in range(3):
-                w_group = []
-                groups = res[i]['wish' + str(k+1)].split(',')
-                for group in groups:
-                    if not group:
-                        w_group.append([])
-                        continue
-                    g_usr = []
-                    user_info = userDB(int(group)).query()
-                    if user_info['grouped'] == 'n':
-                        g_usr.append("%s %s" % (group, userDB(group).query()['u_name']))
-                    elif user_info['grouped'] == 'l':
-                        group_id = user_info['group_id']
-                        ids = groupDB(group_id).all_users()
-                        for id in ids:
-                            g_usr.append("%s %s" % (id, userDB(int(id)).query()['u_name']))
-                    w_group.append(g_usr)
-                all_grp.append(w_group)
-            data.append({"i":i+1,'title':res[i]['title'],'groups':all_grp})
+
+        for project in res:
+            users = projectDB(project['id']).assignedUser()
+            project['users'] = users or []
+
+        isolate_user = userDB(0).isolateUser()
+        print(isolate_user)
+
+        # for i in range(len(res)):
+        #     all_grp = []
+        #     for k in range(3):
+        #         w_group = []
+        #         groups = res[i]['wish' + str(k+1)].split(',')
+        #         for group in groups:
+        #             if not group:
+        #                 w_group.append([])
+        #                 continue
+        #             g_usr = []
+        #             user_info = userDB(int(group)).query()
+        #             if user_info['grouped'] == 'n':
+        #                 g_usr.append("%s %s" % (group, userDB(group).query()['u_name']))
+        #             elif user_info['grouped'] == 'l':
+        #                 group_id = user_info['group_id']
+        #                 ids = groupDB(group_id).all_users()
+        #                 for id in ids:
+        #                     g_usr.append("%s %s" % (id, userDB(int(id)).query()['u_name']))
+        #             w_group.append(g_usr)
+        #         all_grp.append(w_group)
+        #     data.append({"i":i+1,'title':res[i]['title'],'groups':all_grp})
         if '.' in output:
-            export(data, "exported/%s" % output)
+            export(res, isolate_user, "exported/%s" % output)
             self.redirect('/exported/%s' % output)
         else:
-            export(data, "exported/%s.xlsx" % output)
+            export(res, isolate_user, "exported/%s.xlsx" % output)
             self.redirect('/exported/%s.xlsx' % output)
+
 
 if __name__ == "__main__":
     data = [{'i': 1, 'title': 'Freesense-Backlight Panel Defect Recognition', 'groups': [[['吴承刚']], [[]], [[]]]}]

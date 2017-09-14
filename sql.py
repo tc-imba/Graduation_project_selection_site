@@ -59,6 +59,9 @@ class userDB(dbFunction):
         else:
             self.u_name = ''
 
+    def isolateUser(self):
+        return self.dataQuery(("SELECT * FROM users WHERE pid=0"))
+
     def validUser(self):
         if self.u_name:
             return True
@@ -341,6 +344,9 @@ class projectDB(dbFunction):
                     'count(id)']
             data.append([num, group_num])
         return data
+
+    def assignedUser(self):
+        return self.dataQuery(("SELECT * FROM users WHERE pid='%d'" % self.id))
 
 
 class fileDB(dbFunction):
