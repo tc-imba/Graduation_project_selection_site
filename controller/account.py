@@ -142,7 +142,7 @@ class registedHandler(BaseHandler):
         if role == 'admin':
             self.render('403.html', u_name=u_name, role=role)
         else:
-            self.render("registed.html", registed=registed, u_name=u_name, nav='',
+            self.render("registed.html", registed=registed, u_name=u_name, nav='', baseurl=base_url,
                         stat=stat, role=role, statstr=statstr, projid=projid, grouped=res['grouped'])
 
 
