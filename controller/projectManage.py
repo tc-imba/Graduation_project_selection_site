@@ -221,10 +221,10 @@ class assignHandler(BaseHandler):
                     if wishes[i] > 0 and wishes[i] in projects:
                         projects[wishes[i]]['wish'][i].append([user])
             else:
-                if student['group_id'] in groups:
+                if student['group_id'] not in groups:
+                    groups[student['group_id']] = {'users': [], 'wish': [0,0,0]}
+                if student['pid'] == 0:
                     groups[student['group_id']]['users'].append(user)
-                else:
-                    groups[student['group_id']] = {'users': [user]}
                 if student['grouped'] == 'l':
                     groups[student['group_id']]['wish'] = [student['wish0'], student['wish1'], student['wish2']]
         for key in groups:
