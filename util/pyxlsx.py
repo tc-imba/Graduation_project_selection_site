@@ -65,7 +65,7 @@ def export(projects, isolate_user, output):
 
     row = 3
     project_num = 1
-    print(projects)
+
     for project in projects:
         if len(project['users']) == 0:
             height = 0
@@ -137,7 +137,6 @@ class exportHandler(BaseHandler):
             project['users'] = users or []
 
         isolate_user = userDB(0).isolateUser()
-        print(isolate_user)
 
         # for i in range(len(res)):
         #     all_grp = []
