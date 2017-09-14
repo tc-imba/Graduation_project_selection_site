@@ -73,10 +73,10 @@
                             {% if len(users) <= 1 %}
                             <li>{{ users[0]['u_name'] }}</li>
                             {% else %}
-                            <li>Group:
+                            <li>(
                                 {% for user in users %}
                                 {{ user['u_name'] }}
-                                {% end %}
+                                {% end %})
                             </li>
                             {% end %}
                             {% end %}

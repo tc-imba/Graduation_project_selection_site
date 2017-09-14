@@ -34,7 +34,8 @@
 }
 ul li{
   list-style-type:none;
-  float:left;
+  text-align: left;
+  /*float:left;*/
 }
 
 .assign{
