@@ -11,7 +11,31 @@
 </head>
 <body>
 
-{% include "navbar.html" %}
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="my-toggle navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <i class="fa fa-bars" aria-hidden="true"></i>
+            </button>
+            <a class="navbar-brand" href="/">
+                <p>JI Graduation Project Website</p>
+            </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" aria-expanded="false">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/">Projects</a>
+                </li>
+                <li>
+                    <a href="/joinGroup">Groups</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right navbar-notlogin">
+                <li class="dropdown"><a href="#">Not logged in</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
 <div class="contents login-panel">
     <div class="container-fluid">
