@@ -68,18 +68,31 @@
                     {% for j in range(3) %}
                     <div class="somegro">
                         <ul>
-                            <li>Preference {{ j + 1 }}:</li>
-                            {% for users in projects[id]['wish'][j] %}
-                            {% if len(users) <= 1 %}
-                            <li>{{ users[0]['u_name'] }}</li>
+                        <li>Preference {{ j + 1 }}:</li>
+                        {% set temp = 0 %}
+                        {% for users in projects[id]['wish'][j] %}
+                        {% if len(users) <= 1 %}
+                        {% if temp == 0 %}
+                        <li>{{ users[0]['u_name'] }}&nbsp;
+                            {% set temp = 1 %}
                             {% else %}
-                            <li>(
-                                {% for user in users %}
-                                {{ user['u_name'] }}
-                                {% end %})
-                            </li>
-                            {% end %}
-                            {% end %}
+                            {{ users[0]['u_name'] }}</li>
+                        {% set temp = 0 %}
+                        {% end %}
+                        {% end %}
+                        {% end %}
+                        {% if temp == 1 %}
+                        </li>
+                        {% end %}
+                        {% for users in projects[id]['wish'][j] %}
+                        {% if len(users) > 1 %}
+                        <li>(
+                            {% for user in users %}
+                            {{ user['u_name'] }}
+                            {% end %})
+                        </li>
+                        {% end %}
+                        {% end %}
                         </ul>
                     </div>
                     {% end %}

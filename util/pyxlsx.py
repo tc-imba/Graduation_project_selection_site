@@ -84,7 +84,7 @@ class exportHandler(BaseHandler):
         if role=='stu':
             self.render('403.html', u_name=u_name, role=role)
         else:
-            self.render('export.html', u_name=u_name, role=role)
+            self.render('export.html', u_name=u_name, role=role, nav='')
 
     @tornado.web.authenticated
     def post(self):
