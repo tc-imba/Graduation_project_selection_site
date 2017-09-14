@@ -90,7 +90,7 @@ class userDB(dbFunction):
         return self.dataQuery(("SELECT id, u_name, grouped, group_id FROM users WHERE role = 'stu'"))
 
     def freeStudents(self):
-        return self.dataQuery(("SELECT *  FROM users WHERE pid = 0 AND role = 'stu'"))
+        return self.dataQuery(("SELECT *  FROM users WHERE role = 'stu'"))
 
     def isLeader(self):
         res = self.dataQuery(("SELECT grouped FROM users WHERE id=%d" % self.uid))

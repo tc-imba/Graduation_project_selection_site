@@ -213,7 +213,8 @@ class assignHandler(BaseHandler):
                 'id': student['id'],
                 'u_name': student['u_name']
             }
-            students.append(user)
+            if student['pid'] == 0:
+                students.append(user)
             if student['grouped'] == 'n':
                 wishes = [student['wish0'], student['wish1'], student['wish2']]
                 for i in range(3):
