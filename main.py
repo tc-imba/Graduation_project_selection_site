@@ -59,7 +59,7 @@ class WelcomeHandler(BaseHandler):
             #         if userDB(int(mem)).isLeader():
             #             k += 1
             #     proj['chosen_num%d' % (i + 1)] = k
-        self.render('index.html', u_name=u_name, projs=projs, role=role, sort=sort, flt='')
+        self.render('index.html', u_name=u_name, projs=projs, role=role, sort=sort, flt='', nav='project')
 
 
 class filterHandler(BaseHandler):
@@ -103,7 +103,7 @@ class filterHandler(BaseHandler):
                 projs = sorted(projs, key=lambda proj: proj[name])
             if sort == 'down':
                 projs.reverse()
-        self.render('index.html', u_name=u_name, projs=projs, role=role, sort=sort, flt=flt)
+        self.render('index.html', u_name=u_name, projs=projs, role=role, sort=sort, flt=flt, nav='project')
 
 
 if __name__ == "__main__":

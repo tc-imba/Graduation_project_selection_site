@@ -33,7 +33,7 @@ class BaseHandler(tornado.web.RequestHandler):
 class LoginHandler(BaseHandler):
     def get(self):
         next = self.get_argument('next')
-        self.render('login.html', next=next)
+        self.render('login.html', next=next, role='guest', nav='')
 
         # def post(self):
         #     uid = self.get_argument('username')
@@ -96,7 +96,7 @@ class optionHandler(BaseHandler):
         user = userDB(uid)
         data = user.query()
         role = data['role']
-        self.render("dashboard.html", uid=uid, u_name=self.get_secure_cookie('u_name'), data=data, role=role)
+        self.render("dashboard.html", uid=uid, u_name=self.get_secure_cookie('u_name'), data=data, role=role, nav='')
 
 
 class registedHandler(BaseHandler):
@@ -142,7 +142,7 @@ class registedHandler(BaseHandler):
         if role == 'admin':
             self.render('403.html', u_name=u_name, role=role)
         else:
-            self.render("registed.html", registed=registed, u_name=u_name,
+            self.render("registed.html", registed=registed, u_name=u_name, nav='',
                         stat=stat, role=role, statstr=statstr, projid=projid, grouped=res['grouped'])
 
 
@@ -152,7 +152,7 @@ class forbiddenHandler(BaseHandler):
         u_name = self.get_secure_cookie('u_name').decode('UTF-8')
         uid = int(tornado.escape.xhtml_escape(self.current_user))
         role = userDB(uid).query()['role']
-        self.render('403.html', u_name=u_name, role=role)
+        self.render('403.html', u_name=u_name, role=role, nav='')
 
 
 class memberHandler(BaseHandler):
@@ -162,7 +162,7 @@ class memberHandler(BaseHandler):
         user = userDB(uid)
         data = user.query()
         role = data['role']
-        self.render("memberProfile.html", uid=id, data=data, u_name=self.get_secure_cookie('u_name'), role=role)
+        self.render("memberProfile.html", uid=id, data=data, u_name=self.get_secure_cookie('u_name'), role=role, nav='')
 
 
 class jaloginHandler(BaseHandler):

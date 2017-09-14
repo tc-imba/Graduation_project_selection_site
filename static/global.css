@@ -8,3 +8,7 @@ body {
     margin-right: auto;
     text-align: left;
 }
+
+body {
+    padding-top: 70px;
+}

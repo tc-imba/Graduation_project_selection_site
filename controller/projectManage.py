@@ -30,7 +30,7 @@ class detailHandler(BaseHandler):
         for file in files:
             file['url'] = base_url + '/file/' + file['sha1']
         self.render("detail.html", i=id, proj=proj, u_name=self.get_secure_cookie('u_name'), isIn=isIn, role=role,
-                    baseurl=base_url, files=files, num=num, grouped=res['grouped'])
+                    baseurl=base_url, files=files, num=num, grouped=res['grouped'], nav='project')
 
 
 class registerHandler(BaseHandler):
@@ -40,7 +40,7 @@ class registerHandler(BaseHandler):
         new = new.split(",")
         uid = int(tornado.escape.xhtml_escape(self.current_user))
         role = userDB(uid).query()['role']
-        self.render("register.html", new=new, role=role)
+        self.render("register.html", new=new, role=role, nav='project')
 
     @tornado.web.authenticated
     def post(self):  # Post the result of chosen project
@@ -113,7 +113,7 @@ class createProjectHandler(BaseHandler):
             self.render('403.html', u_name=u_name, role=role)
         else:
             self.render('create_project.html', u_name=u_name, proj=project, role=role, title=title, detail=detail,
-                        isedit=isedit, pid=pid, baseurl=base_url, files=files)
+                        isedit=isedit, pid=pid, baseurl=base_url, files=files, nav='project')
 
     @tornado.web.authenticated
     def post(self):
@@ -236,7 +236,7 @@ class assignHandler(BaseHandler):
             self.render('403.html', u_name=u_name, role=role)
         else:
             self.render('assign_projects.html', u_name=u_name, role=role, projs=projs, all_usr=all_usr,
-                        students=students, projects=projects)
+                        students=students, projects=projects, nav='assign')
 
     @tornado.web.authenticated
     def post(self):
