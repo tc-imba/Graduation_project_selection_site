@@ -215,10 +215,10 @@ class assignHandler(BaseHandler):
             }
             if student['pid'] == 0:
                 students.append(user)
-            if student['grouped'] == 'n':
+            if student['grouped'] == 'n' and student['pid'] == 0:
                 wishes = [student['wish0'], student['wish1'], student['wish2']]
                 for i in range(3):
-                    if wishes[i] > 0 and wishes[i] in projects:
+                    if wishes[i] > 0 and wishes[i]  in projects:
                         projects[wishes[i]]['wish'][i].append([user])
             else:
                 if student['group_id'] not in groups:
@@ -232,6 +232,8 @@ class assignHandler(BaseHandler):
             for i in range(3):
                 if wishes[i] > 0 and wishes[i] in projects:
                     projects[wishes[i]]['wish'][i].append(groups[key]['users'])
+
+        print(groups)
 
         if role == 'stu':
             self.render('403.html', u_name=u_name, role=role)
