@@ -60,7 +60,7 @@ class userDB(dbFunction):
             self.u_name = ''
 
     def isolateUser(self):
-        return self.dataQuery(("SELECT * FROM users WHERE pid=0"))
+        return self.dataQuery(("SELECT * FROM users WHERE pid=0 AND role='stu'"))
 
     def validUser(self):
         if self.u_name:

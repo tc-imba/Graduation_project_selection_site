@@ -233,7 +233,7 @@ class assignHandler(BaseHandler):
                 if wishes[i] > 0 and wishes[i] in projects:
                     projects[wishes[i]]['wish'][i].append(groups[key]['users'])
 
-        print(groups)
+        # print(groups)
 
         if role == 'stu':
             self.render('403.html', u_name=u_name, role=role)
