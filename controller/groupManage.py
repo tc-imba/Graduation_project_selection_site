@@ -27,7 +27,7 @@ class joinGroupHandler(BaseHandler):
                 else:
                     groups[id]['members'].append({'id': student['id'], 'u_name': student['u_name']})
 
-        print(groups)
+        # print(groups)
         self.render("groups.html", stat=stat, gid=gid, users=res, u_name=u_name, groups=groups, role=role, nav='group')
 
 
