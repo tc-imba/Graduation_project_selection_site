@@ -1,8 +1,8 @@
 -- MySQL dump 10.13  Distrib 5.7.19, for Linux (x86_64)
 --
--- Host: 127.0.0.1    Database: ipp
+-- Host: 45.76.213.89    Database: ipp
 -- ------------------------------------------------------
--- Server version	5.7.19-0ubuntu0.17.04.1
+-- Server version	5.7.17-0ubuntu0.16.10.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -39,7 +39,6 @@ CREATE TABLE `files` (
 
 LOCK TABLES `files` WRITE;
 /*!40000 ALTER TABLE `files` DISABLE KEYS */;
-INSERT INTO `files` VALUES (1,4,'2017-2018-1(Fall)UndergraduateClass170907.xlsx','5e539f6f8366a89352aa40811962ef96c8f56c4f',59893,0);
 /*!40000 ALTER TABLE `files` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -67,7 +66,6 @@ CREATE TABLE `groups` (
 
 LOCK TABLES `groups` WRITE;
 /*!40000 ALTER TABLE `groups` DISABLE KEYS */;
-INSERT INTO `groups` VALUES (1,'刘逸灏','',515370910207,'',0);
 /*!40000 ALTER TABLE `groups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -105,7 +103,6 @@ CREATE TABLE `projects` (
 
 LOCK TABLES `projects` WRITE;
 /*!40000 ALTER TABLE `projects` DISABLE KEYS */;
-INSERT INTO `projects` VALUES (1,'1','1505372556.374436.png','1','1','','','',3,0,0,0,0,'ECE','1','n'),(2,'2','1505372772.2290943.png','2','2','','','',1,0,0,0,0,'ME','2','n'),(3,'Formal Methods','1505372764.6187446.png','符少','orz Luke Xuan','','','',4,0,0,0,0,'ECE','轩帝','n'),(4,'3','1505373176.4737446.png','3','*3*','','','',2,0,0,0,0,'ME','3','n'),(5,'4','1505372969.4012003.png','4','4','','','',1,0,0,0,0,'ECE','4','n');
 /*!40000 ALTER TABLE `projects` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -139,7 +136,6 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (515370910093,'符晓浛','stu',1234567890,'ECE','male','n',0,0,0,4,5),(515370910202,'王天泽','stu',13761911368,'ECE','male','n',0,0,3,0,0),(515370910207,'刘逸灏','stu',18964688141,'ECE','male','l',1,0,3,0,0),(515370910212,'荆远方','stu',15960249769,'ECE','male','y',1,0,3,0,0),(516370910031,'张怡斐','stu',12345678901,'ECE','female','n',0,0,0,0,0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -152,4 +148,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-09-14 17:02:03
+-- Dump completed on 2017-09-15 12:07:51

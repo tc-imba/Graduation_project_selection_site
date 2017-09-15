@@ -79,10 +79,11 @@ class filterHandler(BaseHandler):
             #             k += 1
             #     proj['chosen_num%d' % (i + 1)] = k
         if flt != 'other':
-            projs = filter(lambda proj: proj['major'].lower() == flt, projs)
+            projs = filter(lambda proj: proj['major'].lower() == flt or proj['major'].lower() == 'both', projs)
         else:
             projs = filter(lambda proj: proj['major'].lower() != 'me', projs)
             projs = filter(lambda proj: proj['major'].lower() != 'ece', projs)
+            projs = filter(lambda proj: proj['major'].lower() != 'both', projs)
         role = userDB(uid).query()['role']
         sort = self.get_argument('sort', default='')
         name = self.get_argument('name', default='')
