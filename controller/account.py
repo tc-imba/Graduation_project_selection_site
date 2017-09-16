@@ -81,12 +81,12 @@ class LogoutHandler(BaseHandler):
     def get(self):
         self.clear_cookie("username")
         self.clear_cookie("u_name")
-        self.redirect("/")
+        self.redirect("https://jaccount.sjtu.edu.cn/oauth2/logout?post_logout_redirect_uri=" + base_url)
 
     def post(self):
         if (self.get_argument("logout", None)):
             self.clear_cookie("username")
-        self.redirect("/")
+        self.redirect("https://jaccount.sjtu.edu.cn/oauth2/logout?post_logout_redirect_uri=" + base_url)
 
 
 class optionHandler(BaseHandler):
