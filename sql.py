@@ -70,11 +70,18 @@ class userDB(dbFunction):
     def query(self):
         return self.dataQuery(("SELECT * FROM users WHERE id = %d" % self.uid))[0]
 
-    def newUser(self, u_name, role, pwd, phone, major, sex):
+    def newUser(self, u_name, role, phone, major, sex):
         self.u_name = u_name
         self.group_id = 0
         op = ("INSERT INTO users VALUES ('%d', '%s', '%s', %d, '%s', '%s', 'n', 0, 0, 0, 0, 0)" % (
             self.uid, u_name, role, int(phone), major, sex))
+        self.dataUpdate(op)
+
+    def updateUser(self, u_name, role, phone, major, sex):
+        self.u_name = u_name
+        self.group_id = 0
+        op = ("UPDATE users SET u_name='%s', role='%s', phone='%d', major='%s', sex='%s' WHERE id='%d'" % (
+            u_name, role, int(phone), major, sex, self.uid))
         self.dataUpdate(op)
 
     def deleteUser(self):
@@ -129,24 +136,24 @@ class userDB(dbFunction):
             op = ("UPDATE users SET grouped='y', group_id=%d, wish0='%s', wish1='%s', wish2='%s' WHERE id=%d" %
                   (group_id, leader['wish0'], leader['wish1'], leader['wish2'], self.uid))
             self.dataUpdate(op)
-        # qry = self.dataQuery(("SELECT users, user_id FROM groups WHERE id=%d" % id))[0]
-        # if qry['users']:
-        #     users = qry['users'].split(',')
-        #     ids = qry['user_id'].split(',')
-        #     ids.append(str(self.uid))
-        #     users.append(self.u_name)
-        # else:
-        #     ids = [str(self.uid)]
-        #     users = [self.u_name]
-        # ids = ','.join(ids)
-        # users = ','.join(users)
-        # op = ("UPDATE groups SET users='%s', user_id='%s' WHERE id=%d" % (users, ids, id))
-        # self.dataUpdate(op)
-        # op = ("UPDATE users SET group_id=%d, grouped='y' WHERE id=%d" % (id, self.uid))
-        # self.dataUpdate(op)
-        # leader = self.dataQuery("SELECT leader_id FROM groups WHERE id=%d" % id)[0]['leader_id']
-        # res = self.dataQuery("SELECT registed FROM users WHERE id=%d" % leader)[0]['registed']
-        # self.register(res)
+            # qry = self.dataQuery(("SELECT users, user_id FROM groups WHERE id=%d" % id))[0]
+            # if qry['users']:
+            #     users = qry['users'].split(',')
+            #     ids = qry['user_id'].split(',')
+            #     ids.append(str(self.uid))
+            #     users.append(self.u_name)
+            # else:
+            #     ids = [str(self.uid)]
+            #     users = [self.u_name]
+            # ids = ','.join(ids)
+            # users = ','.join(users)
+            # op = ("UPDATE groups SET users='%s', user_id='%s' WHERE id=%d" % (users, ids, id))
+            # self.dataUpdate(op)
+            # op = ("UPDATE users SET group_id=%d, grouped='y' WHERE id=%d" % (id, self.uid))
+            # self.dataUpdate(op)
+            # leader = self.dataQuery("SELECT leader_id FROM groups WHERE id=%d" % id)[0]['leader_id']
+            # res = self.dataQuery("SELECT registed FROM users WHERE id=%d" % leader)[0]['registed']
+            # self.register(res)
 
     def quitGroup(self):
         if self.group_id > 0:
