@@ -53,15 +53,15 @@
         {#        {% if projs[i]['assigned'] == 'n' %}#}
         <div class="single-proj">
             <div class="overview row">
-                <div class="img col-md-3">
-                    <a href="#">
-                        <img class="thumbnail img-responsive" src="/img/{{ projects[id]['img'] }}">
-                    </a>
-                </div>
-                <div class="title col-md-3">
+{#                <div class="img col-md-3">#}
+{#                    <a href="#">#}
+{#                        <img class="thumbnail img-responsive" src="/img/{{ projects[id]['img'] }}">#}
+{#                    </a>#}
+{#                </div>#}
+                <div class="title col-md-2">
                     <p> {{ projects[id]['title'] }} </p>
                 </div>
-                <div class="allgroups col-md-6">
+                <div class="allgroups col-md-10">
                     {% if projects[id]['assigned'] == 'y' %}
 
                     {% else %}
@@ -69,21 +69,13 @@
                     <div class="somegro">
                         <ul>
                         <li>Preference {{ j + 1 }}:</li>
-                        {% set temp = 0 %}
+                        <li>
                         {% for users in projects[id]['wish'][j] %}
                         {% if len(users) <= 1 %}
-                        {% if temp == 0 %}
-                        <li>{{ users[0]['u_name'] }}&nbsp;
-                            {% set temp = 1 %}
-                            {% else %}
-                            {{ users[0]['u_name'] }}</li>
-                        {% set temp = 0 %}
+                        {{ users[0]['u_name'] }}&nbsp;
                         {% end %}
                         {% end %}
-                        {% end %}
-                        {% if temp == 1 %}
                         </li>
-                        {% end %}
                         {% for users in projects[id]['wish'][j] %}
                         {% if len(users) > 1 %}
                         <li>(
