@@ -132,7 +132,7 @@ class userDB(dbFunction):
     def joinGroup(self, group_id):
         leader = self.dataQuery(("SELECT * FROM users WHERE grouped='l' AND group_id=%d" % group_id))[0]
         count = self.dataQuery(("SELECT count(id) FROM users WHERE group_id=%d" % group_id))[0]['count(id)']
-        if count < 4:
+        if count < 5:
             op = ("UPDATE users SET grouped='y', group_id=%d, wish0='%s', wish1='%s', wish2='%s' WHERE id=%d" %
                   (group_id, leader['wish0'], leader['wish1'], leader['wish2'], self.uid))
             self.dataUpdate(op)
