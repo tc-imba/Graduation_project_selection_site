@@ -70,7 +70,7 @@ class userDB(dbFunction):
     def query(self):
         return self.dataQuery(("SELECT * FROM users WHERE id = %d" % self.uid))[0]
 
-    def newUser(self, u_name, role, pwd, phone, major, sex):
+    def newUser(self, u_name, role, phone, major, sex):
         self.u_name = u_name
         self.group_id = 0
         op = ("INSERT INTO users VALUES ('%d', '%s', '%s', %d, '%s', '%s', 'n', 0, 0, 0, 0, 0)" % (
