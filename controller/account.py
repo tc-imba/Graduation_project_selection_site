@@ -68,15 +68,13 @@ class UserRegisterHandler(BaseHandler):
             return
         u_name = self.get_secure_cookie('u_name_t').decode('UTF-8')
         uid = self.get_secure_cookie('username_t').decode('UTF-8')
-
-        udb = userDB(uid)
-        if len(udb.u_name) > 0:
-            self.redirect('/')
-            return
-
         role = self.get_secure_cookie('role').decode('UTF-8')
         gender = self.get_secure_cookie('gender').decode('UTF-8')
-        udb.newUser(u_name, role, phone, major, gender)
+        udb = userDB(uid)
+        if len(udb.u_name) > 0:
+            udb.updateUser(u_name, role, phone, major, gender)
+        else:
+            udb.newUser(u_name, role, phone, major, gender)
         self.set_secure_cookie("u_name", u_name)
         self.set_secure_cookie("username", str(uid))
         self.set_secure_cookie("vd", '')
